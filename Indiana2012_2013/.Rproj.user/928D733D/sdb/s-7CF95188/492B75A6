@@ -1,0 +1,18 @@
+{
+    "contents" : "# Data exploration for data collected in Marshall County, IN in 2012 and 2013 by\n# Lizz Waring and Scott Holaday. \n\nlibrary(dplyr)\nlibrary(tidyr)\nlibrary(ggplot2)\nlibrary(nlme)\n\nsoil12 <- read.csv(\"lachat2012.csv\")\nsoil13 <- read.csv(\"lachat2013.csv\")\nplants12 <- read.csv(\"data2012.csv\")\nplants13 <- read.csv(\"data2013.csv\")\n\nsoil12$year <- 2012\nsoil13$year <- 2013\n\n\nsoil1 <- soil12 %>% separate(Analyte, into=c(\"Ammonia\",\"NO3+NO2\"))\n",
+    "created" : 1437415886998.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2361705100",
+    "id" : "492B75A6",
+    "lastKnownWriteTime" : 1437416081,
+    "path" : "~/GitHub/Indiana201213/dataExplorer.R",
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

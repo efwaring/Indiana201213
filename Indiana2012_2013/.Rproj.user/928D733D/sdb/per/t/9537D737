@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1437439003414.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "9537D737",
+    "lastKnownWriteTime" : 1702323561,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "ogze577bva",
+        "caption" : "p2013",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=p2013&cache_key=ogze577bva",
+        "displayedObservations" : 103,
+        "environment" : "",
+        "object" : "p2013",
+        "totalObservations" : 103,
+        "variables" : 10
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

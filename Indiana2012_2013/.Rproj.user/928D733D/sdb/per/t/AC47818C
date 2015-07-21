@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1437438010637.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "AC47818C",
+    "lastKnownWriteTime" : 1702323561,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "q3er8qhig8",
+        "caption" : "soil",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=soil&cache_key=q3er8qhig8",
+        "displayedObservations" : "12",
+        "environment" : "",
+        "object" : "soil",
+        "totalObservations" : "12",
+        "variables" : "9"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

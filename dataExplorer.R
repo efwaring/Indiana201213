@@ -11,8 +11,35 @@ soil13 <- read.csv("lachat2013.csv")
 plants12 <- read.csv("data2012.csv")
 plants13 <- read.csv("data2013.csv")
 
-soil12$year <- 2012
-soil13$year <- 2013
 
 
-soil1 <- soil12 %>% separate(Analyte, into=c("Ammonia","NO3+NO2"))
+# filter 2013 site that were sampled in 2012
+sub13 <- soil13 %>% filter(place==15|place==16)
+
+sub12 <- soil12 %>% group_by(site, rep, month, place) %>%
+        summarise(ammonia.g=mean(ammonia.g),
+                              ammonia.kg=mean(ammonia.kg),
+                              no3.no2.g=mean(no3.no2.g),
+                              no3.no2.kg=mean(no3.no2.kg))
+
+sub12$year <- 2012
+sub13$year <- 2013
+
+soil <- bind_rows(sub13, sub12)
+
+# grouping similar measurments from 2012 and 2013
+# get only Cs and Pa in plants 13
+plants13 <- plants13 %>% filter(spp=="Cs"|spp=="Pa")
+
+p2013 <- plants13 %>% group_by(site, rep, month, place) %>%
+  select(totC,C13,totN,SLA,LMA,ug.gfw_pr)
+p2013$year <- 2013
+
+p2012 <- plants12 %>% group_by(site, rep, month, place) %>%
+  select(totC,C13,totN,SLA,LMA,ug.gfw_pr)
+p2012$year <- 2012
+
+plants <- rbind(p2012, p2013)
+
+
+

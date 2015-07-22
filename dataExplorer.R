@@ -7,11 +7,16 @@
 # 2) Do seasonal chainges in leaf phys/morph traits relate to soil N?(2012/2013)
 # 3) Does a relationship between soil N and leaf N exist? (2013)
 
+# set working directory
+setwd("~/Indiana201213")
+
+# packages needed
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(nlme)
 
+# data import
 soil12 <- read.csv("lachat2012.csv")
 soil13 <- read.csv("lachat2013.csv")
 plants12 <- read.csv("data2012.csv")
@@ -55,20 +60,28 @@ p2012$year <- "2012"
 
 plants <- rbind(p2012, p2013)
 
+
 plants$placef <- factor(plants$place,
                                labels = 1:22)
 plants$yearf <- factor(plants$year,
                         labels=c("2012", "2013"))
 plants$species <- factor(plants$spp,
                           labels=c("C. stricta", "P. arundinacea"))
+# subset of only sites sampled in 2012 and 2013
+
+plantSub <- plants13 %>% filter(place==15|place==16)
+plantSub <- rbind(p2012, plantSub)
+
 
 
 #  comparasion between year
+# do I need a t.test or anova?  Is difference between species important if it 
+# is the same species?
 
-totN.aov <- aov(totN~spp+month+place+year, data=plants)
-summary(totN.aov)
+totN.aov <- t.test(totN~year, data=plants)
 
-totC.aov <- aov(totC~spp+month+place+year, data=plants)
+
+totC.aov <- (totC~spp+month+place+year, data=plants)
 summary(totC.aov)
 
 c13.aov <- aov(C13~spp+month+place+year, data=plants)

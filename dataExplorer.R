@@ -98,6 +98,13 @@ summary(pr.aov)
 # for both Cs and Pa.  Possibly doing a PCA to compress data like Waring and
 # Holaday growth chamber experiment
 
+# data used: ce, amba, vcmax, jmax, NR activity by weight(mgcl2.hr),
+# NR activity by chl (nr.hr.chl), protien(ug.gfw_pr), SLA, totN, totC, C13
+
+
+
+
+
 
 
 

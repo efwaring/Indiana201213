@@ -2,8 +2,8 @@
 # Lizz Waring and Scott Holaday. 
 
 # Data being used to answer the following questions
-# 1) How do Carex stricta and Phalaris arundinacea N-use strategies differ
-# seasonally? (2012)
+# 1) How do Carex stricta (Cs) and Phalaris arundinacea(Pa) N-use strategies 
+# differ seasonally? (2012)
 # 2) Do seasonal chainges in leaf phys/morph traits relate to soil N?(2012/2013)
 # 3) Does a relationship between soil N and leaf N exist? (2013)
 
@@ -69,7 +69,7 @@ plants$species <- factor(plants$spp,
                           labels=c("C. stricta", "P. arundinacea"))
 # subset of only sites sampled in 2012 and 2013
 
-plantSub <- plants13 %>% filter(place==15|place==16)
+plantSub <- p2013 %>% filter(place==15|place==16)
 plantSub <- rbind(p2012, plantSub)
 
 
@@ -78,20 +78,25 @@ plantSub <- rbind(p2012, plantSub)
 # do I need a t.test or anova?  Is difference between species important if it 
 # is the same species?
 
-totN.aov <- t.test(totN~year, data=plants)
+totN.aov <- t.test(totN~year, data=plantSub)
 
 
-totC.aov <- (totC~spp+month+place+year, data=plants)
+totC.aov <- aov(totC~spp+month+place+year, data=plantSub)
 summary(totC.aov)
 
-c13.aov <- aov(C13~spp+month+place+year, data=plants)
+c13.aov <- aov(C13~spp+month+place+year, data=plantSub)
 summary(c13.aov)
 
-SLA.aov <- aov(SLA~spp+month+place+year, data=plants)
+SLA.aov <- aov(SLA~spp+month+place+year, data=plantSub)
 summary(SLA.aov)
 
-pr.aov <- aov(ug.gfw_pr~spp+month+place+year, data=plants)
+pr.aov <- aov(ug.gfw_pr~spp+month+place+year, data=plantSub)
 summary(pr.aov)
+
+# to answer question 1 need data from 2012. Using mixed effects model to 
+# analyize how physioloigcal traits differed seasonally and what this means
+# for both Cs and Pa.  Possibly doing a PCA to compress data like Waring and
+# Holaday growth chamber experiment
 
 
 

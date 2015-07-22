@@ -1,6 +1,12 @@
 # Data exploration for data collected in Marshall County, IN in 2012 and 2013 by
 # Lizz Waring and Scott Holaday. 
 
+# Data being used to answer the following questions
+# 1) How do Carex stricta and Phalaris arundinacea N-use strategies differ
+# seasonally? (2012)
+# 2) Do seasonal chainges in leaf phys/morph traits relate to soil N?(2012/2013)
+# 3) Does a relationship between soil N and leaf N exist? (2013)
+
 library(dplyr)
 library(tidyr)
 library(ggplot2)

@@ -4,7 +4,7 @@
 # Data being used to answer the following questions
 # 1) How do Carex stricta (Cs) and Phalaris arundinacea(Pa) N-use strategies 
 # differ seasonally? (2012)
-# 2) Do seasonal chainges in leaf phys/morph traits relate to soil N?(2012/2013)
+# 2) Do seasonal changes in leaf phys/morph traits relate to soil N?(2012/2013)
 # 3) Does a relationship between soil N and leaf N exist? (2013)
 
 # set working directory
@@ -15,6 +15,8 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(nlme)
+library(ade4)
+
 
 # data import
 soil12 <- read.csv("lachat2012.csv")
@@ -101,12 +103,23 @@ summary(pr.aov)
 # data used: ce, amba, vcmax, jmax, NR activity by weight(mgcl2.hr),
 # NR activity by chl (nr.hr.chl), protien(ug.gfw_pr), SLA, totN, totC, C13
 
+pca <- plants12 %>% select(ce,amba,vcmax,jmax,mgcl2.hr,nr.hr.chl,ug.gfw_pr, 
+                           SLA,totN,totC,C13)
+
+PCA12 <- dudi.pca(pca,scale=T,scannf=F)
+sums <- 100 * PCA12$eig/sum(PCA12$eig)
+cumsum(sums)
+scatter(PCA12)
+s.label(PCA12$co,boxes=F)
+PCA12$eig #check # of axis with eig>1. Test these.
 
 
 
-
-
-
+# to answer question 2, Do seasonal changes in leaf phys/morph traits relate 
+# to soil N? Need data from both 2012 and 2013.  Since there was no statistical
+# differences between leaf N or C13 or protein in 2012 and 2013 can include 
+# both.  Need data on leaf N, C13, leaf C, CN, SLA, and leaf protien as well
+# as well soil N
 
 
 

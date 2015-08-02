@@ -106,6 +106,8 @@ summary(pr.aov)
 pca <- plants12 %>% select(ce,amba,vcmax,jmax,mgcl2.hr,nr.hr.chl,ug.gfw_pr, 
                            SLA,totN,totC,C13)
 
+pca <- na.omit(pca)
+
 PCA12 <- dudi.pca(pca,scale=T,scannf=F)
 sums <- 100 * PCA12$eig/sum(PCA12$eig)
 cumsum(sums)

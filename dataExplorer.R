@@ -123,5 +123,20 @@ PCA12$eig #check # of axis with eig>1. Test these.
 # both.  Need data on leaf N, C13, leaf C, CN, SLA, and leaf protien as well
 # as well soil N
 
+# current plan is a mixed effects model.  Nested by individual.  Time is
+# continous. 
+
+#theortical set up:
+
+#lme(var ~ soilN + time + spp + soilN:time + soilN:spp, random =~1|individual,
+#   data=data)
+
+
+# to anser question 3,Does a relationship between soil N and leaf N exist? 
+# first, question may need to be rephrased.
+# data from 2013 is needed.  Could do simple linear model to examine difference?
+# however, from data, might not be a linear fit.  More indepth, does time of 
+# year affect relationship between soil and leaf N?  Does it differ between 
+# species. Using model selection might be worth while here. 
 
 

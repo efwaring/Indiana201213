@@ -7,8 +7,8 @@
 # 2) Do seasonal changes in leaf phys/morph traits relate to soil N?(2012/2013)
 # 3) Does a relationship between soil N and leaf N exist? (2013)
 
-# set working directory
-setwd("~/Indiana201213")
+
+
 
 # packages needed
 library(dplyr)
@@ -18,7 +18,7 @@ library(nlme)
 library(ade4)
 
 
-# data import
+# data import use github folder "data" as working directory
 soil12 <- read.csv("lachat2012.csv")
 soil13 <- read.csv("lachat2013.csv")
 plants12 <- read.csv("data2012.csv")
@@ -42,11 +42,13 @@ soil <- bind_rows(sub13, sub12)
 
 # comparasion between year
 
-amm.aov <- aov(ammonia.kg~month+place+year, data=soil)
+amm.aov <- lm(ammonia.kg~month+place+year, data=soil)
 summary(amm.aov)
+anova(amm.aov)
 
-nit.aov <- aov(no3.no2.kg~month+place+year, data=soil)
+nit.aov <- lm(no3.no2.kg~month+place+year, data=soil)
 summary(nit.aov)
+anova(nit.aov)
 
 # grouping similar measurments from 2012 and 2013
 # get only Cs and Pa in plants 13
@@ -80,20 +82,26 @@ plantSub <- rbind(p2012, plantSub)
 # do I need a t.test or anova?  Is difference between species important if it 
 # is the same species?
 
-totN.aov <- t.test(totN~year, data=plantSub)
+totN.aov <- lm(totN~spp+month+place+year, data=plantSub)
+summary(totN.aov)
+anova(totN.aov)
 
 
-totC.aov <- aov(totC~spp+month+place+year, data=plantSub)
+totC.aov <- lm(totC~spp+month+place+year, data=plantSub)
 summary(totC.aov)
+anova(totC.aov)
 
-c13.aov <- aov(C13~spp+month+place+year, data=plantSub)
+c13.aov <- lm(C13~spp+month+place+year, data=plantSub)
 summary(c13.aov)
+anova(c13.aov)
 
-SLA.aov <- aov(SLA~spp+month+place+year, data=plantSub)
+SLA.aov <- lm(SLA~spp+month+place+year, data=plantSub)
 summary(SLA.aov)
+anova(SLA.aov)
 
-pr.aov <- aov(ug.gfw_pr~spp+month+place+year, data=plantSub)
+pr.aov <- lm(ug.gfw_pr~spp+month+place+year, data=plantSub)
 summary(pr.aov)
+anova(pr.aov)
 
 # to answer question 1 need data from 2012. Using mixed effects model to 
 # analyize how physioloigcal traits differed seasonally and what this means
@@ -103,7 +111,8 @@ summary(pr.aov)
 # data used: ce, amba, vcmax, jmax, NR activity by weight(mgcl2.hr),
 # NR activity by chl (nr.hr.chl), protien(ug.gfw_pr), SLA, totN, totC, C13
 
-pca <- plants12 %>% select(ce,amba,vcmax,jmax,mgcl2.hr,nr.hr.chl,ug.gfw_pr, 
+pca <- plants12 %>% select(ce,amba,vcmax,jmax,mgcl2.hr,nr.hr.chl,chl,
+                           ug.gfw_pr, 
                            SLA,totN,totC,C13)
 
 pca <- na.omit(pca)
@@ -114,6 +123,37 @@ cumsum(sums)
 scatter(PCA12)
 s.label(PCA12$co,boxes=F)
 PCA12$eig #check # of axis with eig>1. Test these.
+
+
+# constants from Niinemets et al 1998
+
+vcr = 20.5
+jmc = 156
+cb = 2.15
+
+# convert totN from mass base to area base
+plants12$totN2 <- plants$totN/100 # converts cg/g to g/g
+plants12$LMA2 <- plants$LMA*10000 # converts g/cm^2 to g/m^2
+plants12$Na = plants12$LMA2 * plants12$totN2
+
+plants12$PC <- plants12$vcmax/(6.25*vcr*plants12$Na)
+plants12$PB <- plants12$jmax/(8.06*jmc*plants12$Na)
+plants12$PL <- plants12$chl/(plants12$totN*cb)
+
+ggplot(data=plants12, aes(spp, PC)) +
+  geom_boxplot()+
+  facet_grid(date~rep)
+
+
+ggplot(data=plants12, aes(spp, PB)) +
+  geom_boxplot()+
+  facet_grid(date~rep)
+
+
+ggplot(data=plants12, aes(spp, PL)) +
+  geom_boxplot() +
+  facet_grid(date~rep)
+
 
 
 

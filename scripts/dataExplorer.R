@@ -134,7 +134,7 @@ cb = 2.15
 # convert totN from mass base to area base
 plants12$totN2 <- plants$totN/100 # converts cg/g to g/g
 plants12$LMA2 <- plants$LMA*10000 # converts g/cm^2 to g/m^2
-plants12$Na = plants12$LMA2 * plants12$totN2
+plants12$Na = plants12$LMA * plants12$totN2
 
 plants12$PC <- plants12$vcmax/(6.25*vcr*plants12$Na)
 plants12$PB <- plants12$jmax/(8.06*jmc*plants12$Na)

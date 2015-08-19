@@ -134,11 +134,17 @@ cb = 2.15
 # convert totN from mass base to area base
 plants12$totN2 <- plants$totN/100 # converts cg/g to g/g
 plants12$LMA2 <- plants$LMA*10000 # converts g/cm^2 to g/m^2
-plants12$Na = plants12$LMA * plants12$totN2
+plants12$Na = plants12$LMA2 * plants12$totN2
 
-plants12$PC <- plants12$vcmax/(6.25*vcr*plants12$Na)
-plants12$PB <- plants12$jmax/(8.06*jmc*plants12$Na)
-plants12$PL <- plants12$chl/(plants12$totN*cb)
+# get vcmax, jmax, and chl on mass basis
+
+plants12$vcmaxM <- plants12$LMA2 * plants12$vcmax
+plants12$jmaxM <- plants12$LMA2 * plants12$jmax
+plants12$chlM <- plants12$LMA2 * plants12$chl
+
+plants12$PC <- plants12$vcmaxM/(6.25*vcr*plants12$Na)
+plants12$PB <- plants12$jmaxM/(8.06*jmc*plants12$Na)
+plants12$PL <- plants12$chlM/(plants12$totN*cb)
 
 ggplot(data=plants12, aes(spp, PC)) +
   geom_boxplot()+

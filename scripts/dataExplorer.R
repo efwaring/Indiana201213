@@ -142,6 +142,8 @@ plants12$vcmaxM <- plants12$LMA2 * plants12$vcmax
 plants12$jmaxM <- plants12$LMA2 * plants12$jmax
 plants12$chlM <- plants12$LMA2 * plants12$chl
 
+# from niiements 1997.  However, units are off by order of mag
+
 plants12$PC <- plants12$vcmaxM/(6.25*vcr*plants12$Na)
 plants12$PB <- plants12$jmaxM/(8.06*jmc*plants12$Na)
 plants12$PL <- plants12$chlM/(plants12$totN*cb)

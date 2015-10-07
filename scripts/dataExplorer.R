@@ -27,18 +27,25 @@ plants13 <- read.csv("data2013.csv")
 
 
 # filter 2013 site that were sampled in 2012
-sub13 <- soil13 %>% filter(place==15|place==16)
 
-sub12 <- soil12 %>% group_by(site, rep, month, place) %>%
+
+soil12$year <- 2012
+soil13$year <- 2013
+
+sub13 <- soil13 %>% filter(place==15|place==16)
+sub12 <- soil12 %>% group_by(site, rep, month, place,year) %>%
         summarise(ammonia.g=mean(ammonia.g),
                               ammonia.kg=mean(ammonia.kg),
                               no3.no2.g=mean(no3.no2.g),
                               no3.no2.kg=mean(no3.no2.kg))
 
-sub12$year <- 2012
-sub13$year <- 2013
+
+
 
 soil <- bind_rows(sub13, sub12)
+
+# keep in soil data from other sites besides 82a1 and 82a2
+allSoil <- bind_rows(sub12,soil13)
 
 # comparasion between year
 
@@ -79,8 +86,7 @@ plantSub <- rbind(p2012, plantSub)
 
 
 #  comparasion between year
-# do I need a t.test or anova?  Is difference between species important if it 
-# is the same species?
+
 
 totN.aov <- lm(totN~spp+month+place+year, data=plantSub)
 summary(totN.aov)
@@ -132,15 +138,13 @@ jmc = 156
 cb = 2.15
 
 # convert totN from mass base to area base
-plants12$totN2 <- plants$totN/100 # converts cg/g to g/g
-plants12$LMA2 <- plants$LMA*10000 # converts g/cm^2 to g/m^2
-plants12$Na = plants12$LMA2 * plants12$totN2
+plants12$Na = plants12$LMA * plants12$totN
 
 # get vcmax, jmax, and chl on mass basis
 
-plants12$vcmaxM <- plants12$LMA2 * plants12$vcmax
-plants12$jmaxM <- plants12$LMA2 * plants12$jmax
-plants12$chlM <- plants12$LMA2 * plants12$chl
+plants12$vcmaxM <- plants12$LMA * plants12$vcmax
+plants12$jmaxM <- plants12$LMA * plants12$jmax
+plants12$chlM <- plants12$LMA * plants12$chl
 
 # from niiements 1997.  However, units are off by order of mag
 
@@ -176,8 +180,30 @@ ggplot(data=plants12, aes(spp, PL)) +
 
 #theortical set up:
 
-#lme(var ~ soilN + time + spp + soilN:time + soilN:spp, random =~1|individual,
-#   data=data)
+
+
+all <- merge(allSoil, plants, by=c("place","month","rep", "year"))
+all$soilN <- all$ammonia.kg + all$no3.no2.kg
+all$individual <- all$rep + all$place
+
+n.lme <- lme(totN ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
+    data=all, na.action=na.omit)
+
+anova(n.lme)
+
+ggplot(all, aes(soilN, totN, shape=spp, color=spp)) +
+  geom_point()+
+  facet_grid(month~.)+ 
+  geom_smooth(method="lm")
+
+sla.lme <- lme(SLA ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
+             data=all, na.action=na.omit)
+
+anova(sla.lme)
+
+ggplot(all, aes(soilN, SLA, shape=spp, color=spp)) +
+  geom_point()+
+  facet_grid(month~.)
 
 
 # to anser question 3,Does a relationship between soil N and leaf N exist? 

@@ -185,6 +185,7 @@ ggplot(data=plants12, aes(spp, PL)) +
 all <- merge(allSoil, plants, by=c("place","month","rep", "year"))
 all$soilN <- all$ammonia.kg + all$no3.no2.kg
 all$individual <- all$rep + all$place
+all$cn <- all$totC/all$totN
 
 n.lme <- lme(totN ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
     data=all, na.action=na.omit)
@@ -205,6 +206,32 @@ ggplot(all, aes(soilN, SLA, shape=spp, color=spp)) +
   geom_point()+
   facet_grid(month~.)
 
+c13.lme <- lme(C13 ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
+               data=all, na.action=na.omit)
+
+anova(c13.lme)
+
+ggplot(all, aes(soilN, C13, shape=spp, color=spp)) +
+  geom_point()+
+  facet_grid(month~.)
+
+cn.lme <- lme(cn ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
+               data=all, na.action=na.omit)
+
+anova(cn.lme)
+
+ggplot(all, aes(soilN, cn, shape=spp, color=spp)) +
+  geom_point()+
+  facet_grid(month~.)
+
+pr.lme <- lme(ug.gfw_pr ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
+               data=all, na.action=na.omit)
+
+anova(pr.lme)
+
+ggplot(all, aes(soilN, ug.gfw_pr, shape=spp, color=spp)) +
+  geom_point()+
+  facet_grid(month~.)
 
 # to anser question 3,Does a relationship between soil N and leaf N exist? 
 # first, question may need to be rephrased.

@@ -16,6 +16,7 @@ library(tidyr)
 library(ggplot2)
 library(nlme)
 library(ade4)
+library(reshape)
 
 # for making figures
 source("theme-opts.R")
@@ -266,6 +267,25 @@ ggplot(data=plants12, aes(month, PL, color=species, shape=species)) +
 ggsave("PL.pdf")
 
 
+allP <- melt(plants12, id.vars=c("species","site", "month","placef","spp", 
+                                 "indi"))
+
+allP <- subset(allP, variable=="PC" | variable=="PL" | variable=="PB")
+allP <- na.omit(allP)
+
+allPM <- ddply(allP, .(month, species, variable), summarize,
+               proportion = mean(value),
+               proportionSD = sd(value))
+
+ggplot(data=allPM, aes(month, proportion, color=variable, shape=variable)) +
+  geom_pointrange(aes(ymin=proportion-proportionSD,
+                      ymax=proportion+proportionSD))+
+  scale_color_manual(name="N placement",
+                     values = c("black", "gray50", "blue"))+
+  facet_grid(.~species)+
+  themeopts
+
+ggsave("PALL.pdf")
 # to answer question 2, Do seasonal changes in leaf phys/morph traits relate 
 # to soil N? Need data from both 2012 and 2013.  Since there was no statistical
 # differences between leaf N or C13 or protein in 2012 and 2013 can include 

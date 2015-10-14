@@ -17,12 +17,15 @@ library(ggplot2)
 library(nlme)
 library(ade4)
 
+# for making figures
+source("theme-opts.R")
 
 # data import use github folder "data" as working directory
 soil12 <- read.csv("lachat2012.csv")
 soil13 <- read.csv("lachat2013.csv")
 plants12 <- read.csv("data2012.csv")
 plants13 <- read.csv("data2013.csv")
+
 
 
 
@@ -43,19 +46,45 @@ sub12 <- soil12 %>% group_by(site, rep, month, place,year) %>%
 
 
 soil <- bind_rows(sub13, sub12)
+soil$yearf <- factor(soil$year,
+                        labels=c("2012", "2013"))
+soil$placef <- factor(soil$place,
+                         labels = 1:2)
+
 
 # keep in soil data from other sites besides 82a1 and 82a2
 allSoil <- bind_rows(sub12,soil13)
-
+allSoil$placef <- factor(allSoil$place,
+                        labels = 1:22)
+allSoil$yearf <- factor(allSoil$year,
+                       labels=c("2012", "2013"))
 # comparasion between year
 
-amm.aov <- lm(ammonia.kg~month+place+year, data=soil)
+amm.aov <- lm(ammonia.kg~month+place+year+month:year, data=soil)
 summary(amm.aov)
 anova(amm.aov)
 
-nit.aov <- lm(no3.no2.kg~month+place+year, data=soil)
+ggplot(soil, aes(month, ammonia.kg, shape=placef, color=yearf)) +
+  geom_point() +
+  geom_smooth(method="lm", se=F) +
+  scale_color_manual(name="Year",
+                     values = c("black", "gray50")) +
+  themeopts
+
+ggsave("ammoniaYear.pdf")
+
+nit.aov <- lm(no3.no2.kg~month+place+year+month:year, data=soil)
 summary(nit.aov)
 anova(nit.aov)
+
+ggplot(soil, aes(month, no3.no2.kg, shape=placef, color=yearf)) +
+  geom_point() +
+  geom_smooth(method="lm", se=F) +
+  scale_color_manual(name="Year",
+                     values = c("black", "gray50")) +
+  themeopts
+
+ggsave("NO2+3Year.pdf")
 
 # grouping similar measurments from 2012 and 2013
 # get only Cs and Pa in plants 13
@@ -82,32 +111,85 @@ plants$species <- factor(plants$spp,
 
 plantSub <- p2013 %>% filter(place==15|place==16)
 plantSub <- rbind(p2012, plantSub)
+plantSub$placef <- factor(plantSub$place,
+                        labels = 1:2)
+plantSub$yearf <- factor(plantSub$year,
+                       labels=c("2012", "2013"))
+plantSub$species <- factor(plantSub$spp,
+                         labels=c("C. stricta", "P. arundinacea"))
 
 
 
 #  comparasion between year
 
 
-totN.aov <- lm(totN~spp+month+place+year, data=plantSub)
+totN.aov <- lm(totN~spp+month+place+year+month:year, data=plantSub)
 summary(totN.aov)
 anova(totN.aov)
 
+ggplot(plantSub, aes(month, totN, shape=placef, color=yearf)) +
+  geom_point() +
+  geom_smooth(method="lm", se=F) +
+  scale_color_manual(name="Year",
+                     values = c("black", "gray50")) +
+  facet_grid(species~.)+
+  themeopts
+ggsave("TotalNYear.pdf")
 
-totC.aov <- lm(totC~spp+month+place+year, data=plantSub)
+
+totC.aov <- lm(totC~spp+month+place+year+month:year, data=plantSub)
 summary(totC.aov)
 anova(totC.aov)
 
-c13.aov <- lm(C13~spp+month+place+year, data=plantSub)
+ggplot(plantSub, aes(month, totC, shape=placef, color=yearf)) +
+  geom_point() +
+  geom_smooth(method="lm", se=F) +
+  scale_color_manual(name="Year",
+                     values = c("black", "gray50")) +
+  facet_grid(species~.)+
+  themeopts
+ggsave("TotalCYear.pdf")
+
+c13.aov <- lm(C13~spp+month+place+year+month:year, data=plantSub)
 summary(c13.aov)
 anova(c13.aov)
 
-SLA.aov <- lm(SLA~spp+month+place+year, data=plantSub)
+ggplot(plantSub, aes(month, C13, shape=placef, color=yearf)) +
+  geom_point() +
+  geom_smooth(method="lm", se=F) +
+  scale_color_manual(name="Year",
+                     values = c("black", "gray50")) +
+  facet_grid(species~.)+
+  themeopts
+ggsave("C13Year.pdf")
+
+SLA.aov <- lm(SLA~spp+month+place+year+month:year, data=plantSub)
 summary(SLA.aov)
 anova(SLA.aov)
 
-pr.aov <- lm(ug.gfw_pr~spp+month+place+year, data=plantSub)
+ggplot(plantSub, aes(month, SLA, shape=placef, color=yearf)) +
+  geom_point() +
+  geom_smooth(method="lm", se=F) +
+  scale_color_manual(name="Year",
+                     values = c("black", "gray50")) +
+  facet_grid(species~.)+
+  themeopts
+
+ggsave("SLAYear.pdf")
+
+pr.aov <- lm(ug.gfw_pr~spp+month+place+year+month:year, data=plantSub)
 summary(pr.aov)
 anova(pr.aov)
+
+ggplot(plantSub, aes(month, ug.gfw_pr, shape=placef, color=yearf)) +
+  geom_point() +
+  geom_smooth(method="lm", se=F) +
+  scale_color_manual(name="Year",
+                     values = c("black", "gray50")) +
+  facet_grid(species~.)+
+  themeopts
+
+ggsave("proteinYear.pdf")
 
 # to answer question 1 need data from 2012. Using mixed effects model to 
 # analyize how physioloigcal traits differed seasonally and what this means
@@ -121,7 +203,7 @@ pca <- plants12 %>% select(ce,amba,vcmax,jmax,mgcl2.hr,nr.hr.chl,chl,
                            ug.gfw_pr, 
                            SLA,totN,totC,C13)
 
-pca <- na.omit(pca)
+pca <- cor(pca)
 
 PCA12 <- dudi.pca(pca,scale=T,scannf=F)
 sums <- 100 * PCA12$eig/sum(PCA12$eig)
@@ -146,27 +228,42 @@ plants12$vcmaxM <- plants12$LMA * plants12$vcmax
 plants12$jmaxM <- plants12$LMA * plants12$jmax
 plants12$chlM <- plants12$LMA * plants12$chl
 
-# from niiements 1997.  However, units are off by order of mag
+# from niiements 1997.  
 
 plants12$PC <- plants12$vcmaxM/(6.25*vcr*plants12$Na)
 plants12$PB <- plants12$jmaxM/(8.06*jmc*plants12$Na)
 plants12$PL <- plants12$chlM/(plants12$totN*cb)
 
-ggplot(data=plants12, aes(spp, PC)) +
-  geom_boxplot()+
-  facet_grid(date~rep)
+
+# will figure out a quicker way to do this
+plants12$placef <- factor(plants12$place,
+                          labels = 1:2)
+plants12$species <- factor(plants12$spp,
+                           labels=c("C. stricta", "P. arundinacea"))
+
+ggplot(data=plants12, aes(month, PC, color=species, shape=species)) +
+  geom_point(size=3)+
+  scale_color_manual(name="species",
+                     values = c("black", "gray50"))+
+  themeopts
+ggsave("PC.pdf")
 
 
-ggplot(data=plants12, aes(spp, PB)) +
-  geom_boxplot()+
-  facet_grid(date~rep)
+ggplot(data=plants12, aes(month, PB, color=species, shape=species)) +
+  geom_point(size=3)+
+  scale_color_manual(name="species",
+                     values = c("black", "gray50"))+
+  themeopts
+ggsave("PB.pdf")
 
 
-ggplot(data=plants12, aes(spp, PL)) +
-  geom_boxplot() +
-  facet_grid(date~rep)
+ggplot(data=plants12, aes(month, PL, color=species, shape=species)) +
+  geom_point(size=3)+
+  scale_color_manual(name="species",
+                     values = c("black", "gray50"))+
+  themeopts
 
-
+ggsave("PL.pdf")
 
 
 # to answer question 2, Do seasonal changes in leaf phys/morph traits relate 

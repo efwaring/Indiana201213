@@ -216,7 +216,7 @@ PCA12$eig #check # of axis with eig>1. Test these.
 
 # constants from Niinemets et al 1998
 
-vcr = 20.5
+
 jmc = 156
 cb = 2.15
 
@@ -229,7 +229,10 @@ plants12$vcmaxM <- plants12$LMA * plants12$vcmax
 plants12$jmaxM <- plants12$LMA * plants12$jmax
 plants12$chlM <- plants12$LMA * plants12$chl
 
-# from niiements 1997.  
+# from niiements 1997 "A model separating leaf structural and
+# physiological effects on carbon gain along light gradients for the 
+# shade-tolerant species Acer saccharum".  Also see 
+# Oecologia (2007) 153:501–510 by Feng
 
 plants12$PC <- plants12$vcmaxM/(6.25*vcr*plants12$Na)
 plants12$PB <- plants12$jmaxM/(8.06*jmc*plants12$Na)

@@ -304,10 +304,13 @@ loadings <- PCA12$co
 
 write.csv(loadings, "loadings.csv")
 
+plants12$PCA1 <- PCA12$li$Axis1
+plants12$PCA2 <- PCA12$li$Axis2
+plants12$PCA3 <- PCA12$li$Axis3
 
 # stats for questions one
-N12.aov <- lme(totN ~ spp+month+place+spp:place+spp:month, 
-                     random=~1|indi, data=p2012)
+N12.aov <- lme(PCA3 ~ spp+month+place+spp:place+spp:month, 
+                     random=~1|indi, data=plants12)
 anova(N12.aov)
 
 seasonChange(plants12$tot)

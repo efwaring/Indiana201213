@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1445280586047.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "AFA43BA4",
+    "lastKnownWriteTime" : 578055781,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "jw3sn12x55",
+        "caption" : "loadings",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=loadings&cache_key=jw3sn12x55",
+        "displayedObservations" : 15,
+        "environment" : "",
+        "object" : "loadings",
+        "totalObservations" : 15,
+        "variables" : 3
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

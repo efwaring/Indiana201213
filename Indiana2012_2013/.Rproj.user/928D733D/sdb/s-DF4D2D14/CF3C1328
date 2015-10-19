@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1445279933016.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "CF3C1328",
+    "lastKnownWriteTime" : 539763315,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "7lmxg7um0j",
+        "caption" : "plants",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=plants&cache_key=7lmxg7um0j",
+        "displayedObservations" : 163,
+        "environment" : "",
+        "object" : "plants",
+        "totalObservations" : 163,
+        "variables" : 13
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

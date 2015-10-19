@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1445280031000.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1301D0A2",
+    "lastKnownWriteTime" : 1702323561,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "cbapdwja4c",
+        "caption" : "p2012",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=p2012&cache_key=cbapdwja4c",
+        "displayedObservations" : 60,
+        "environment" : "",
+        "object" : "p2012",
+        "totalObservations" : 60,
+        "variables" : 13
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

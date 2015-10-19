@@ -93,8 +93,9 @@ plants13 <- plants13 %>% filter(spp=="Cs"|spp=="Pa")
 p2013 <- plants13 %>% group_by(site, rep, month, place, spp) %>%
   select(totC,C13,totN,SLA,LMA,ug.gfw_pr)
 p2013$year <- "2013"
+p2013$indi <- length(p2013$site)
 
-p2012 <- plants12 %>% group_by(site, rep, month, place, spp) %>%
+p2012 <- plants12 %>% group_by(indi,site, rep, month, place, spp) %>%
   select(totC,C13,totN,SLA,LMA,ug.gfw_pr)
 p2012$year <- "2012"
 
@@ -198,19 +199,6 @@ ggsave("proteinYear.pdf")
 # data used: ce, amba, vcmax, jmax, NR activity by weight(mgcl2.hr),
 # NR activity by chl (nr.hr.chl), protien(ug.gfw_pr), SLA, totN, totC, C13
 
-pca <- plants12 %>% select(ce,amba,vcmax,jmax,mgcl2.hr,nr.hr.chl,chl,
-                           ug.gfw_pr, 
-                           SLA,totN,totC,C13)
-
-pca <- cor(pca)
-
-PCA12 <- dudi.pca(pca,scale=T,scannf=F)
-sums <- 100 * PCA12$eig/sum(PCA12$eig)
-cumsum(sums)
-scatter(PCA12)
-s.label(PCA12$co,boxes=F)
-PCA12$eig #check # of axis with eig>1. Test these.
-
 
 # constants from Niinemets et al 1998
 
@@ -237,11 +225,16 @@ plants12$PB <- plants12$jmaxM/(8.06*jmc*plants12$Na)
 plants12$PL <- plants12$chlM/(plants12$totN*cb)
 
 
+
 # will figure out a quicker way to do this
 plants12$placef <- factor(plants12$place,
                           labels = 1:2)
 plants12$species <- factor(plants12$spp,
                            labels=c("C. stricta", "P. arundinacea"))
+
+pc.lme <- lme(PC ~ spp+month+place+spp:place+spp:month, 
+                         random=~1|indi, data=plants12, na.action=na.omit)
+anova(pc.lme)
 
 ggplot(data=plants12, aes(month, PC, color=species, shape=species)) +
   geom_point(size=3)+
@@ -250,6 +243,9 @@ ggplot(data=plants12, aes(month, PC, color=species, shape=species)) +
   themeopts
 ggsave("PC.pdf")
 
+pb.lme <- lme(PB ~ spp+month+place+spp:place+spp:month, 
+              random=~1|indi, data=plants12, na.action=na.omit)
+anova(pb.lme)
 
 ggplot(data=plants12, aes(month, PB, color=species, shape=species)) +
   geom_point(size=3)+
@@ -258,6 +254,9 @@ ggplot(data=plants12, aes(month, PB, color=species, shape=species)) +
   themeopts
 ggsave("PB.pdf")
 
+pl.lme <- lme(PL ~ spp+month+place+spp:place+spp:month, 
+              random=~1|indi, data=plants12, na.action=na.omit)
+anova(pl.lme)
 
 ggplot(data=plants12, aes(month, PL, color=species, shape=species)) +
   geom_point(size=3)+
@@ -286,14 +285,26 @@ ggplot(data=allPM, aes(month, proportion, color=variable, shape=variable)) +
 
 ggsave("PALL.pdf")
 
+pca <- plants12 %>% select(ce,amba,vcmax,jmax,mgcl2.hr,nr.hr.chl,chl,
+                           ug.gfw_pr, 
+                           SLA,totN,totC,C13, PC,PB,PL)
+pca <- na.omit(pca)
+
+pca <- cor(pca)
+
+
+PCA12 <- dudi.pca(pca,scale=T,scannf=F)
+sums <- 100 * PCA12$eig/sum(PCA12$eig)
+cumsum(sums)
+scatter(PCA12)
+s.label(PCA12$co,boxes=F)
+PCA12$eig #check # of axis with eig>1. Test these.
+
 
 # stats for questions one
-
-seasonChange <- function(variable) {
-  variable.aov <- nlme(variable ~ species+month+place+species:place+species:month, 
-                       random=~1|indi, data=p2012)
-  return(anova(varible.aov))
-}
+N12.aov <- lme(totN ~ spp+month+place+spp:place+spp:month, 
+                     random=~1|indi, data=p2012)
+anova(N12.aov)
 
 seasonChange(plants12$tot)
 # to answer question 2, Do seasonal changes in leaf phys/morph traits relate 

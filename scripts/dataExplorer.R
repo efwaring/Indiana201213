@@ -293,12 +293,16 @@ pca <- na.omit(pca)
 pca <- cor(pca)
 
 
-PCA12 <- dudi.pca(pca,scale=T,scannf=F)
+PCA12 <- dudi.pca(pca,scale=T,scannf=F, nf=3)
 sums <- 100 * PCA12$eig/sum(PCA12$eig)
 cumsum(sums)
 scatter(PCA12)
 s.label(PCA12$co,boxes=F)
 PCA12$eig #check # of axis with eig>1. Test these.
+
+loadings <- PCA12$co
+
+write.csv(loadings, "loadings.csv")
 
 
 # stats for questions one

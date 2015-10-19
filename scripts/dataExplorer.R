@@ -16,7 +16,6 @@ library(tidyr)
 library(ggplot2)
 library(nlme)
 library(ade4)
-library(reshape)
 
 # for making figures
 source("theme-opts.R")

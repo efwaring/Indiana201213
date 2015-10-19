@@ -1,0 +1,25 @@
+{
+    "contents" : "",
+    "created" : 1445278088835.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "15FF8C1",
+    "lastKnownWriteTime" : 578055781,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "hqfizd9tyq",
+        "caption" : "plants12",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=plants12&cache_key=hqfizd9tyq",
+        "displayedObservations" : 60,
+        "environment" : "",
+        "object" : "plants12",
+        "totalObservations" : 60,
+        "variables" : 36
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

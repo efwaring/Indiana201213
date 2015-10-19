@@ -21,11 +21,11 @@ library(ade4)
 source("theme-opts.R")
 
 # data import use github folder "data" as working directory
+
 soil12 <- read.csv("lachat2012.csv")
 soil13 <- read.csv("lachat2013.csv")
 plants12 <- read.csv("data2012.csv")
 plants13 <- read.csv("data2013.csv")
-
 
 
 
@@ -55,7 +55,7 @@ soil$placef <- factor(soil$place,
 # keep in soil data from other sites besides 82a1 and 82a2
 allSoil <- bind_rows(sub12,soil13)
 allSoil$placef <- factor(allSoil$place,
-                        labels = 1:22)
+                        labels = 1:2)
 allSoil$yearf <- factor(allSoil$year,
                        labels=c("2012", "2013"))
 # comparasion between year
@@ -121,7 +121,6 @@ plantSub$species <- factor(plantSub$spp,
 
 
 #  comparasion between year
-
 
 totN.aov <- lm(totN~spp+month+place+year+month:year, data=plantSub)
 summary(totN.aov)
@@ -215,7 +214,7 @@ PCA12$eig #check # of axis with eig>1. Test these.
 
 # constants from Niinemets et al 1998
 
-
+vcr = 20.5
 jmc = 156
 cb = 2.15
 
@@ -268,12 +267,10 @@ ggplot(data=plants12, aes(month, PL, color=species, shape=species)) +
 
 ggsave("PL.pdf")
 
+# reshape proprotion data for figure making.
 
-allP <- melt(plants12, id.vars=c("species","site", "month","placef","spp", 
-                                 "indi"))
-
-allP <- subset(allP, variable=="PC" | variable=="PL" | variable=="PB")
-allP <- na.omit(allP)
+allP <- plants12 %>% gather("Npartition", "percentN", 32:34, na.rm=T) %>%
+  select(indi, place, month, species, Npartition, percentN)
 
 allPM <- ddply(allP, .(month, species, variable), summarize,
                proportion = mean(value),
@@ -288,6 +285,17 @@ ggplot(data=allPM, aes(month, proportion, color=variable, shape=variable)) +
   themeopts
 
 ggsave("PALL.pdf")
+
+
+# stats for questions one
+
+seasonChange <- function(variable) {
+  variable.aov <- nlme(variable ~ species+month+place+species:place+species:month, 
+                       random=~1|indi, data=p2012)
+  return(anova(varible.aov))
+}
+
+seasonChange(plants12$tot)
 # to answer question 2, Do seasonal changes in leaf phys/morph traits relate 
 # to soil N? Need data from both 2012 and 2013.  Since there was no statistical
 # differences between leaf N or C13 or protein in 2012 and 2013 can include 

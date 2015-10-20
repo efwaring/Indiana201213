@@ -1,0 +1,79 @@
+GHCND (Global Historical Climatology Network)-Monthly Summaries
+
+NOTE: English units are displayed on pdf output format; Metric units on csv or txt output formats.
+
+
+
+I. Description
+
+GHCND (Global Historical Climatology Network)-Monthly Summaries is a database that addresses the critical need for historical monthly temperature, precipitation, and snow records over global land areas. The values are derived from the GHCN-Daily database which is a composite of climate records from numerous sources that were merged and then subjected to a suite of quality assurance reviews. The GHCND-Monthly Summaries database includes 18 meteorological elements (see Table A below for complete list) including temperature (monthly means and extremes), precipitation (monthly totals, extremes and number of days various amount thresholds are met), snowfall, maximum snow depth, and degree days.
+The GHCND-Monthly Summaries database, like its daily counterpart from which it was derived, contains observations of one or more of the above elements at more than 40,000 stations that are distributed across all continents.
+Some of the data provided here are based on data exchanged under the World Meteorological Organization (WMO) World Weather Watch Program according to WMO Resolution 40 (Cg-XII). This allows WMO member countries to place restrictions on the use or re-export of their data for commercial purposes outside of the receiving country. Those countries' data summaries and products which are available here are intended for free and unrestricted use in research, education, and other non- commercial activities. For non-U.S. locations data, the data or any derived product shall not be provided to other users or be used for the re-export of commercial services.
+
+
+II. Format/Observation Definitions
+
+(Note: the term ‘element’ is used throughout this documentation and refers to an individual meteorological/climatological measurement or statistical value such as temperature, precipitation (amount), etc.)
+
+Users are given the choice between the following three delivery formats:
+
+1) GHCN-Daily Monthly Summaries Form-Portable Document Format (PDF) output gives monthly values for 18 elements (see Table A).
+2) Custom GHCN-Daily Monthly Summaries ASCII Form-Output is ASCII text file and user is given the choice whether to include flags (attributes), station name or geographic location in data records. The user can define which of the observations (values) listed in Table A (below) to include in data records.
+3) Custom GHCN-Daily Monthly Summaries ASCII Spreadsheet-Options are same as #2 above but
+
+output is given as CSV file for use in spreadsheet applications.
+
+A. Data observations/values
+
+Each record represents all selected observations (i.e. elements) available for a given station-month. The initial section of each record is ordered as follows with the following definitions:
+STATION (17 characters) is the station identification code. Please see http://www1.ncdc.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt
+for a complete list of stations and their metadata.
+
+STATION_NAME (max 50 characters) is the name of the station (usually city/airport name). This is an optional output field.
+GEOGRAPHIC_LOCATION (31 characters) is the latitude (decimated degrees w/northern hemisphere values > 0, southern hemisphere values < 0), longitude (decimated degrees w/western hemisphere values < 0, eastern hemisphere values > 0) and elevation above mean sea level (thousandths of meters). This is an optional output field.
+DATE is the year of the record (4 digits) followed by month (2 digits) and day (2 digits). For these monthly files, all days will be encoded as “01”.
+
+
+B. Observations (values) and flags (attributes)
+
+Following this initial section of the record, all selected observations and flags are given in the following order:
+Observation(s) | Missing Flag | Consecutive Missing Flag | repeat for next observation/element (when more than one element is selected), where:
+Observation(s) is/are synonymous with elements or values, and defined in Table A below. 9’s in a field (e.g.9999) indicate missing data or data that has not been received.
+Missing Flag is defined as total number of days observation/element is missing in that month. This can be taken as a measure of quality or completeness as the higher the number of days sampled in the month, the more representative the value is for the entire month.
+Consecutive Missing Flag is defined as the maximum number of consecutive days in the month that an observation/element is missing.
+Note: The 2 flags listed above are optional on the Custom GHCN-Daily Monthly Summaries ASCII Form and ASCII spreadsheet.
+Table A (observations or values)
+
+
+All 18 observation/element values are defined below. Each of these may be included (or excluded) on the Custom GHCN-Daily Monthly Summaries ASCII Form and all are also included on the GHCN-Daily Monthly Summaries Form-Portable Document Format (PDF).
+
+Note: 9’s in a field (e.g.9999) indicate missing data or data that has not been received. Computed
+CLDD - Cooling degree days. These are using a 65 degree Fahrenheit base and given as a monthly total. Values are given in tenths of degrees Celsius. *
+
+DP10 - Number of days in month with greater than or equal to 1.0 inch of precipitation ** DP05 - Number of days in month with greater than or equal to 0.5 inch of precipitation ** DP01 - Number of days in month with greater than or equal to 0.1 inch of precipitation **
+HTDD - Heating degree days. These use a 65 degree Fahrenheit base and are given as a monthly total. Values are given in tenths of degrees Celsius. *
+DT00 - Number days in month with minimum temperature less than or equal to 0.0 F * DT32 - Number days in month with minimum temperature less than or equal to 32.0 F * DT90 - Number days in month with maximum temperature greater than or equal 90.0 F * DX32 - Number days in month with maximum temperature less than or equal to 32.0 F *
+
+
+Precipitation
+
+EMXP - Extreme maximum daily precipitation total within month (inches to hundredths precision on PDF monthly form/tenths of mm precision on CSV or text) **
+MXSD - Maximum snow depth reported during month (inches precision on PDF monthly form/mm on CSV or text) ***
+TPCP - Total precipitation amount for the month (inches to hundredths precision on PDF monthly form/tenths of mm precision on CSV or text) ***
+TSNW - Total snow fall amount for the month (inches to tenths precision on PDF monthly form/mm on CSV or text) ***
+
+
+Air Temperature (all units in Fahrenheit on PDF monthly form and tenths of degrees Celsius on CSV or text)
+
+EMNT - Extreme minimum temperature * EMXT - Extreme maximum temperature *
+MMNT - Monthly mean minimum temperature * MMXT - Monthly mean maximum temperature * MNTM – Monthly mean temperature *
+Concerning derivation: All observations/elements listed above are derived from another within the GHCND dataset as follows (see GHCND documentation for further details):
+*= derived from TMAX and/or TMIN (daily maximum and minimum temperature)
+
+**=derived from PRCP (daily precipitation total)
+
+***=derived from SNOW (daily snowfall total)
+
+
+
+Additional information on the GHCN-Daily data, from which the GHCN-Monthly data are derived, is available online at http://www1.ncdc.noaa.gov/pub/data/ghcn/daily/readme.txt.

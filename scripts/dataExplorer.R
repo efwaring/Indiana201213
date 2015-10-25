@@ -310,11 +310,17 @@ plants12$PCA2 <- PCA12$li$Axis2
 plants12$PCA3 <- PCA12$li$Axis3
 
 # stats for questions one
-N12.aov <- lme(PCA3 ~ spp+month+place+spp:place+spp:month, 
+photo12.aov <- lme(PCA1 ~ spp+month+place+spp:place+spp:month, 
                      random=~1|indi, data=plants12)
-anova(N12.aov)
+anova(photo12.aov)
 
-seasonChange(plants12$tot)
+traits12.aov <- lme(PCA2 ~ spp+month+place+spp:place+spp:month, 
+                   random=~1|indi, data=plants12)
+anova(traits12.aov)
+
+biochem12.aov <- lme(PCA3 ~ spp+month+place+spp:place+spp:month, 
+                   random=~1|indi, data=plants12)
+anova(biochem12.aov)
 # to answer question 2, Do seasonal changes in leaf phys/morph traits relate 
 # to soil N? Need data from both 2012 and 2013.  Since there was no statistical
 # differences between leaf N or C13 or protein in 2012 and 2013 can include 

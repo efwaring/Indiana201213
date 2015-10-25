@@ -5,7 +5,7 @@
 # 1) How do Carex stricta (Cs) and Phalaris arundinacea(Pa) N-use strategies 
 # differ seasonally? (2012)
 # 2) Do seasonal changes in leaf phys/morph traits relate to soil N?(2012/2013)
-# 3) Does a relationship between soil N and leaf N exist? (2013)
+# 3) model fits for influence on leafphys/morph traits? What is most influencal
 
 
 
@@ -16,6 +16,7 @@ library(tidyr)
 library(ggplot2)
 library(nlme)
 library(ade4)
+library(AICcmodavg)
 
 # for making figures
 source("theme-opts.R")
@@ -332,7 +333,7 @@ all$soilN <- all$ammonia.kg + all$no3.no2.kg
 all$individual <- all$rep + all$place
 all$cn <- all$totC/all$totN
 
-n.lme <- lme(totN ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
+n.lme <- lme(totN ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
     data=all, na.action=na.omit)
 
 anova(n.lme)
@@ -340,9 +341,9 @@ anova(n.lme)
 ggplot(all, aes(soilN, totN, shape=spp, color=spp)) +
   geom_point()+
   facet_grid(month~.)+ 
-  geom_smooth(method="lm")
+  geom_smooth(method="lm", se=F)
 
-sla.lme <- lme(SLA ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
+sla.lme <- lme(SLA ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
              data=all, na.action=na.omit)
 
 anova(sla.lme)
@@ -351,7 +352,7 @@ ggplot(all, aes(soilN, SLA, shape=spp, color=spp)) +
   geom_point()+
   facet_grid(month~.)
 
-c13.lme <- lme(C13 ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
+c13.lme <- lme(C13 ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
                data=all, na.action=na.omit)
 
 anova(c13.lme)
@@ -360,7 +361,7 @@ ggplot(all, aes(soilN, C13, shape=spp, color=spp)) +
   geom_point()+
   facet_grid(month~.)
 
-cn.lme <- lme(cn ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
+cn.lme <- lme(cn ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
                data=all, na.action=na.omit)
 
 anova(cn.lme)
@@ -369,7 +370,7 @@ ggplot(all, aes(soilN, cn, shape=spp, color=spp)) +
   geom_point()+
   facet_grid(month~.)
 
-pr.lme <- lme(ug.gfw_pr ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
+pr.lme <- lme(ug.gfw_pr ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
                data=all, na.action=na.omit)
 
 anova(pr.lme)
@@ -378,11 +379,107 @@ ggplot(all, aes(soilN, ug.gfw_pr, shape=spp, color=spp)) +
   geom_point()+
   facet_grid(month~.)
 
-# to anser question 3,Does a relationship between soil N and leaf N exist? 
-# first, question may need to be rephrased.
-# data from 2013 is needed.  Could do simple linear model to examine difference?
-# however, from data, might not be a linear fit.  More indepth, does time of 
-# year affect relationship between soil and leaf N?  Does it differ between 
-# species. Using model selection might be worth while here. 
+
+# possibly use model selection for quesiton 2
+
+modnames <- c("soilN", "month", "species", "soilN X month", "soilN X species",
+              "place")
+
+# start with leaf N
+cand.leafN<-list()
+cand.leafN[[1]] <- lme(totN ~ soilN,
+                        random=~1|place,method="ML", data=all, 
+                       na.action=na.omit)
+cand.leafN[[2]] <- lme(totN ~ month,
+                        random=~1|place,method="ML", data=all,
+                       na.action=na.omit)
+cand.leafN[[3]] <- lme(totN ~ spp,
+                        random=~1|place,method="ML", data=all,
+                       na.action=na.omit)
+cand.leafN[[4]] <- lme(totN ~ soilN*month,
+                        random=~1|place,method="ML", data=all,
+                        na.action=na.omit)
+cand.leafN[[5]] <- lme(totN ~ soilN*spp,
+                        random=~1|place,method="ML", data=all,
+                       na.action=na.omit)
+cand.leafN[[6]] <- lme(totN ~ place,
+                        random=~1|place,method="ML", data=all,
+                       na.action=na.omit)
+
+library(AICcmodavg)
+
+aictab(cand.leafN, modnames)
+evidence(aictab(cand.leafN, modnames))
+
+# SLA
+
+cand.SLA<-list()
+cand.SLA[[1]] <- lme(SLA ~ soilN,
+                       random=~1|place,method="ML", data=all, 
+                       na.action=na.omit)
+cand.SLA[[2]] <- lme(SLA ~ month,
+                       random=~1|place,method="ML", data=all,
+                       na.action=na.omit)
+cand.SLA[[3]] <- lme(SLA ~ spp,
+                       random=~1|place,method="ML", data=all,
+                       na.action=na.omit)
+cand.SLA[[4]] <- lme(SLA ~ soilN*month,
+                       random=~1|place,method="ML", data=all,
+                       na.action=na.omit)
+cand.SLA[[5]] <- lme(SLA ~ soilN*spp,
+                       random=~1|place,method="ML", data=all,
+                       na.action=na.omit)
+cand.SLA[[6]] <- lme(SLA ~ place,
+                       random=~1|place,method="ML", data=all,
+                       na.action=na.omit)
+aictab(cand.SLA, modnames)
+evidence(aictab(cand.SLA, modnames))
+
+# cn
+cand.cn<-list()
+cand.cn[[1]] <- lme(cn ~ soilN,
+                     random=~1|place,method="ML", data=all, 
+                     na.action=na.omit)
+cand.cn[[2]] <- lme(cn ~ month,
+                     random=~1|place,method="ML", data=all,
+                     na.action=na.omit)
+cand.cn[[3]] <- lme(cn ~ spp,
+                     random=~1|place,method="ML", data=all,
+                     na.action=na.omit)
+cand.cn[[4]] <- lme(cn ~ soilN*month,
+                     random=~1|place,method="ML", data=all,
+                     na.action=na.omit)
+cand.cn[[5]] <- lme(cn ~ soilN*spp,
+                     random=~1|place,method="ML", data=all,
+                     na.action=na.omit)
+cand.cn[[6]] <- lme(cn ~ place,
+                     random=~1|place,method="ML", data=all,
+                     na.action=na.omit)
+aictab(cand.cn, modnames)
+evidence(aictab(cand.cn, modnames))
+
+cand.pr<-list()
+cand.pr[[1]] <- lme(ug.gfw_pr ~ soilN,
+                    random=~1|place,method="ML", data=all, 
+                    na.action=na.omit)
+cand.pr[[2]] <- lme(ug.gfw_pr ~ month,
+                    random=~1|place,method="ML", data=all,
+                    na.action=na.omit)
+cand.pr[[3]] <- lme(ug.gfw_pr ~ spp,
+                    random=~1|place,method="ML", data=all,
+                    na.action=na.omit)
+cand.pr[[4]] <- lme(ug.gfw_pr ~ soilN*month,
+                    random=~1|place,method="ML", data=all,
+                    na.action=na.omit)
+cand.pr[[5]] <- lme(ug.gfw_pr ~ soilN*spp,
+                    random=~1|place,method="ML", data=all,
+                    na.action=na.omit)
+cand.pr[[6]] <- lme(ug.gfw_pr ~ place,
+                    random=~1|place,method="ML", data=all,
+                    na.action=na.omit)
+aictab(cand.pr, modnames)
+evidence(aictab(cand.pr, modnames))
+
+
 
 

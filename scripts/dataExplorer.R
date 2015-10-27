@@ -5,8 +5,7 @@
 # 1) How do Carex stricta (Cs) and Phalaris arundinacea(Pa) N-use strategies 
 # differ seasonally? (2012)
 # 2) Do seasonal changes in leaf phys/morph traits relate to soil N?(2012/2013)
-# 3) model fits for influence on leafphys/morph traits? What is most influencal
-
+# 3) model fits for influence on leafphys/morph traits? 
 
 
 
@@ -15,7 +14,6 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(nlme)
-library(ade4)
 library(AICcmodavg)
 
 # for making figures
@@ -347,7 +345,11 @@ anova(n.lme)
 ggplot(all, aes(soilN, totN, shape=spp, color=spp)) +
   geom_point()+
   facet_grid(month~.)+ 
-  geom_smooth(method="lm", se=F)
+  scale_color_manual(name="N species",
+                     values = c("black", "gray50"))+
+  geom_smooth(method="lm", se=F)+themeopts
+
+ggsave("totN12_13.pdf")
 
 sla.lme <- lme(SLA ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
              data=all, na.action=na.omit)
@@ -356,7 +358,12 @@ anova(sla.lme)
 
 ggplot(all, aes(soilN, SLA, shape=spp, color=spp)) +
   geom_point()+
-  facet_grid(month~.)
+  facet_grid(month~.)+
+  scale_color_manual(name="N species",
+                     values = c("black", "gray50"))+
+  geom_smooth(method="lm", se=F)+themeopts
+
+ggsave("sla12_13.pdf")
 
 c13.lme <- lme(C13 ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
                data=all, na.action=na.omit)
@@ -365,7 +372,12 @@ anova(c13.lme)
 
 ggplot(all, aes(soilN, C13, shape=spp, color=spp)) +
   geom_point()+
-  facet_grid(month~.)
+  facet_grid(month~.)+
+  scale_color_manual(name="N species",
+                     values = c("black", "gray50"))+
+  geom_smooth(method="lm", se=F)+themeopts
+
+ggsave("c1312_13.pdf")
 
 cn.lme <- lme(cn ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
                data=all, na.action=na.omit)
@@ -374,7 +386,12 @@ anova(cn.lme)
 
 ggplot(all, aes(soilN, cn, shape=spp, color=spp)) +
   geom_point()+
-  facet_grid(month~.)
+  facet_grid(month~.)+
+  scale_color_manual(name="N species",
+                     values = c("black", "gray50"))+
+  geom_smooth(method="lm", se=F)+themeopts
+
+ggsave("CN12_13.pdf")
 
 pr.lme <- lme(ug.gfw_pr ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
                data=all, na.action=na.omit)
@@ -383,7 +400,12 @@ anova(pr.lme)
 
 ggplot(all, aes(soilN, ug.gfw_pr, shape=spp, color=spp)) +
   geom_point()+
-  facet_grid(month~.)
+  facet_grid(month~.)+
+  scale_color_manual(name="N species",
+                     values = c("black", "gray50"))+
+  geom_smooth(method="lm", se=F)+themeopts
+
+ggsave("pr12_13.pdf")
 
 
 # possibly use model selection for quesiton 2
@@ -485,7 +507,6 @@ cand.pr[[6]] <- lme(ug.gfw_pr ~ place,
                     na.action=na.omit)
 aictab(cand.pr, modnames)
 evidence(aictab(cand.pr, modnames))
-
 
 
 

@@ -120,6 +120,9 @@ plantSub$yearf <- factor(plantSub$year,
                        labels=c("2012", "2013"))
 plantSub$species <- factor(plantSub$spp,
                          labels=c("C. stricta", "P. arundinacea"))
+plantSub$LMA <- as.numeric(plantSub$LMA)
+plantSub$pro_area <- plantSub$ug.gfw_pr * plantSub$LMA
+
 
 
 
@@ -179,15 +182,16 @@ ggplot(plantSub, aes(month, SLA, shape=placef, color=yearf)) +
 
 ggsave("SLAYear.pdf")
 
-pr.aov <- lm(ug.gfw_pr~spp+month+place+year+month:year, data=plantSub)
+pr.aov <- lm(pre_area~spp+month+place+year+month:year, data=plantSub)
 summary(pr.aov)
 anova(pr.aov)
 
-ggplot(plantSub, aes(month, ug.gfw_pr, shape=placef, color=yearf)) +
+ggplot(plantSub, aes(month, pro_area, shape=placef, color=yearf)) +
   geom_point() +
   geom_smooth(method="lm", se=F) +
   scale_color_manual(name="Year",
                      values = c("black", "gray50")) +
+  labs(y="ug protein per cm^2")+
   facet_grid(species~.)+
   themeopts
 
@@ -333,10 +337,9 @@ anova(biochem12.aov)
 
 
 
-all <- merge(allSoil, p2013, by=c("place","month","rep"))
+all <- merge(allSoil, p2013, by=c("place","month","rep", "year","site"))
 all$soilN <- all$ammonia.kg + all$no3.no2.kg
 all$ratio <- all$ammonia.kg/all$no3.no2.kg
-all$individual <- all$rep + all$place
 all$cn <- all$totC/all$totN
 
 all$speciesN <- as.numeric(factor(all$spp,labels=c(1:2)))
@@ -366,7 +369,7 @@ loadings13 <- PCA13$co
 all$soilFactor <- as.factor(ceiling(all$soilN/50))
 
 n.lme <- lme(totN ~ soilN + month + spp + soilN:month +
-               soilN:spp, random =~1|place,
+               soilN:spp, random =~soilN|place,
     data=all, na.action=na.omit)
 
 anova(n.lme)

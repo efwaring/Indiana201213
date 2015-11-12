@@ -7,6 +7,7 @@
 # 2) Do seasonal changes in leaf phys/morph traits relate to soil N?(2012/2013)
 # 3) model fits for influence on leafphys/morph traits? 
 
+# factor anaylis for q2? library(psych)
 
 
 # packages needed
@@ -14,6 +15,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(nlme)
+library(ade4)
 library(AICcmodavg)
 
 # for making figures
@@ -23,12 +25,13 @@ source("theme-opts.R")
 
 soil12 <- read.csv("lachat2012.csv")
 soil13 <- read.csv("lachat2013.csv")
+
 plants12 <- read.csv("data2012.csv")
 plants13 <- read.csv("data2013.csv")
 
 
 
-# filter 2013 site that were sampled in 2012
+# filter 2013 site that were sampled in 2012                                   
 
 
 soil12$year <- 2012
@@ -328,16 +331,42 @@ anova(biochem12.aov)
 # current plan is a mixed effects model.  Nested by individual.  Time is
 # continous. 
 
-#theortical set up:
 
 
-
-all <- merge(allSoil, plants, by=c("place","month","rep", "year"))
+all <- merge(allSoil, p2013, by=c("place","month","rep"))
 all$soilN <- all$ammonia.kg + all$no3.no2.kg
+all$ratio <- all$ammonia.kg/all$no3.no2.kg
 all$individual <- all$rep + all$place
 all$cn <- all$totC/all$totN
 
-n.lme <- lme(totN ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
+all$speciesN <- as.numeric(factor(all$spp,labels=c(1:2)))
+
+
+all$place <- as.numeric(all$place)
+all$month <- as.numeric(all$month)
+all$speciesN <- as.numeric(all$speciesN)
+all$year <- as.numeric(all$year)
+
+pcaA <- all %>% select(place, month, speciesN, soilN)
+pcaA <- na.omit(pcaA)
+
+pcaA <- cor(pcaA)
+
+
+PCA13 <- dudi.pca(pcaA,scale=T,scannf=F, nf=3)
+sums <- 100 * PCA13$eig/sum(PCA13$eig)
+cumsum(sums)
+scatter(PCA13)
+s.label(PCA13$co,boxes=F)
+PCA13$eig #check # of axis with eig>1. Test these.
+
+loadings13 <- PCA13$co
+
+# Ranking the soil N in by 50 g of N
+all$soilFactor <- as.factor(ceiling(all$soilN/50))
+
+n.lme <- lme(totN ~ soilN + month + spp + soilN:month +
+               soilN:spp, random =~1|place,
     data=all, na.action=na.omit)
 
 anova(n.lme)
@@ -348,6 +377,16 @@ ggplot(all, aes(soilN, totN, shape=spp, color=spp)) +
   scale_color_manual(name="N species",
                      values = c("black", "gray50"))+
   geom_smooth(method="lm", se=F)+themeopts
+
+# with soil rankings
+ggplot(all, aes(month, totN, shape=soilFactor, fill=soilFactor)) +
+  geom_point()+
+  facet_grid(spp~.)+ 
+  scale_shape_manual(name="Total soil N (g/kg)",
+                     values=c(21,21,22,22,23,23,24,24,25,25))+
+  scale_fill_manual(name="Total soil N (g/kg)",
+                    values = c("black", NA, "black", NA, "black",NA,"black",NA,"black",NA)) +
+  themeopts
 
 ggsave("totN12_13.pdf")
 
@@ -379,7 +418,7 @@ ggplot(all, aes(soilN, C13, shape=spp, color=spp)) +
 
 ggsave("c1312_13.pdf")
 
-cn.lme <- lme(cn ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
+cn.lme <- lme(cn ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
                data=all, na.action=na.omit)
 
 anova(cn.lme)

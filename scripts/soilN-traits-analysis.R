@@ -28,7 +28,8 @@ all$ratio <- all$ammonia.kg/all$no3.no2.kg
 all$cn <- all$totC/all$totN
 
 # here I have set up the mixed effects model with soilN nested in place
-# place is a random effect but soilN is fixed, but nested.
+# place is a random effect but soilN is fixed, but nested. I want to have 
+# soil N nested with the random effect of place.
 
 # using nlme
 

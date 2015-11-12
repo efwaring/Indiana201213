@@ -47,5 +47,8 @@ ggplot(all, aes(soilN, totN, shape=spp, color=spp)) +
 
 # using lme4 package
 
-n.lmer <- lmer(totN ~ month + spp + (soilN|place), data=all,
+n.lmer <- lmer(totN ~ spp + month + soilN +(1|place/soilN), data=all,
                na.action=na.omit)
+summary(n.lmer)
+ 
+anova(n.lmer)

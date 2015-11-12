@@ -1,12 +1,12 @@
 {
-    "contents" : "library(lme4)\nlibrary(nlme)\nlibrary(ggplot2)\n\n# read in data. set working dir to data folder\n\nsoil13 <- read.csv(\"lachat2013.csv\")\nplants13 <- read.csv(\"data2013.csv\")\n\n\n# for making clean figures\nsource(\"theme-opts.R\")\n\n\n# filtering plant data\nplants13 <- plants13 %>% filter(spp==\"Cs\"|spp==\"Pa\")\n\np2013 <- plants13 %>% group_by(site, rep, month, place, spp) %>%\n  select(totC,C13,totN,SLA,ug.gfw_pr)\n# don't need currently p2013$year <- \"2013\"\n\nall <- merge(soil13, p2013, by=c(\"place\",\"month\",\"rep\",\"site\"))\nall$soilN <- all$ammonia.kg + all$no3.no2.kg\nall$ratio <- all$ammonia.kg/all$no3.no2.kg\nall$cn <- all$totC/all$totN\n\n\nn.lme <- lme(totN ~ soilN + month + spp + soilN:month +\n               soilN:spp, random =~soilN|place,\n             data=all, na.action=na.omit)\n\nanova(n.lme)\n\nggplot(all, aes(soilN, totN, shape=spp, color=spp)) +\n  geom_point()+\n  facet_grid(month~.)+ \n  scale_color_manual(name=\"N species\",\n                     values = c(\"black\", \"gray50\"))+\n  geom_smooth(method=\"lm\", se=F)+themeopts\n",
+    "contents" : "library(lme4)\nlibrary(nlme)\nlibrary(ggplot2)\n\n# read in data. set working dir to data folder\n\nsoil13 <- read.csv(\"lachat2013.csv\")\nplants13 <- read.csv(\"data2013.csv\")\n\n\n# for making clean figures\nsource(\"theme-opts.R\")\n\n\n# filtering plant data\nplants13 <- plants13 %>% filter(spp==\"Cs\"|spp==\"Pa\")\n\np2013 <- plants13 %>% group_by(site, rep, month, place, spp) %>%\n  select(totC,C13,totN,SLA,ug.gfw_pr)\n# don't need currently p2013$year <- \"2013\"\n\n# merging the soil data with the plant data\n# have a doubling of soil data as one data point for soil N but \n# possibly two points for species.\nall <- merge(soil13, p2013, by=c(\"place\",\"month\",\"rep\",\"site\"))\nall$soilN <- all$ammonia.kg + all$no3.no2.kg\nall$ratio <- all$ammonia.kg/all$no3.no2.kg\nall$cn <- all$totC/all$totN\n\n# here I have set up the mixed effects model with soilN nested in place\n# place is a random effect but soilN is fixed, but nested.\n\n# using nlme\n\nn.lme <- lme(totN ~ soilN + month + spp + soilN:month +\n               soilN:spp, random =~soilN|place,\n             data=all, na.action=na.omit)\n\nanova(n.lme)\n\nggplot(all, aes(soilN, totN, shape=spp, color=spp)) +\n  geom_point()+\n  facet_grid(month~.)+ \n  scale_color_manual(name=\"N species\",\n                     values = c(\"black\", \"gray50\"))+\n  geom_smooth(method=\"lm\", se=F)+themeopts\n\n# using lme4 package\n\nn.lmer <- lmer(totN ~ month + spp + (soilN|place), data=all,\n               na.action=na.omit)\n",
     "created" : 1447349567913.000,
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "4063430841",
+    "hash" : "3899550096",
     "id" : "F8A1FA0A",
-    "lastKnownWriteTime" : 1447349928,
+    "lastKnownWriteTime" : 1447350804,
     "path" : "~/GitHub/Indiana201213/scripts/soilN-traits-analysis.R",
     "project_path" : null,
     "properties" : {

@@ -4,8 +4,8 @@ library(ggplot2)
 
 # read in data. set working dir to data folder
 
-soil13 <- read.csv("lachat2013.csv")
-plants13 <- read.csv("data2013.csv")
+soil13 <- read.csv("../data/lachat2013.csv")
+plants13 <- read.csv("../data/data2013.csv")
 
 
 # for making clean figures

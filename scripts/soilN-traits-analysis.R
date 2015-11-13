@@ -32,13 +32,28 @@ allsoil$cn <- allsoil$totC/allsoil$totN
 # place is a random effect but soilN is fixed, but nested. I want to have 
 # soil N nested with the random effect of place.
 
-# using nlme
+# DWS: I think you mean that soil N may show an effect of site or rep or
+# smapleID. I thinkt he latter?. I'm not sure. I'm sure you don't mean it is
+# nested in "place". I don't udnerstand the column headings well enough. Wht
+# are place, rep, site, sample and sampleID? This is a lot of factors but they
+# seem to be duplicated. I don't think you want this. You have species as a
+# fixed effect so it is fine, no duplication.
 
-n.lme <- lme(totN ~ soilN + month + spp + soilN:month +
-               soilN:spp, random =~soilN|place,
+# using nlme. random intercept by "place"?
+n.lme <- lme(totN ~ soilN*month*spp, random = ~ 1 | place,
              data=allsoil, na.action=na.omit)
-
+summary(n.lme)
 anova(n.lme)
+
+# DWS: or, are you worried about finer scale random effects? You'll have less
+# power and I'm worried since so many sampleIDs are unreplicated. It looks like
+# sample id is all you need as it is what groups the two N values per species? But what do you think groups those? is there a fine scale "plot" variable"
+n2.lme <- lme(totN ~ soilN + month + spp + soilN:month +
+               soilN:spp, random = ~ 1 | Sample.ID,
+             data=allsoil, na.action=na.omit)
+summary(n2.lme)
+anova(n2.lme)
+
 
 ggplot(allsoil, aes(soilN, totN, shape=spp, color=spp)) +
   geom_point()+
@@ -48,9 +63,11 @@ ggplot(allsoil, aes(soilN, totN, shape=spp, color=spp)) +
   geom_smooth(method="lm", se=F)+themeopts
 
 # using lme4 package
-
-n.lmer <- lmer(totN ~ spp + month + soilN +(1|place/soilN), data=allsoil,
+n.lmer <- lmer(totN ~ spp*month*soilN + (1 | place), data=allsoil,
                na.action=na.omit)
 summary(n.lmer)
- 
 anova(n.lmer)
+
+# these match. but you don't get p values. Can us likelihoods. note warning.
+# SHould apply to lme run above as well. Not sure why you had these tesing
+# separate models.

@@ -1,6 +1,7 @@
 library(lme4)
 library(nlme)
 library(ggplot2)
+library(dplyr)
 
 # read in data. set working dir to data folder
 

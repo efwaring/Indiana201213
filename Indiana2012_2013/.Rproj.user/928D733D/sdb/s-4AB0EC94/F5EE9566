@@ -1,0 +1,18 @@
+{
+    "contents" : "textsize <- 18\nthemeopts <- theme( axis.title.y = element_text(size = textsize, \n                                                angle = 90,vjust=0.3) ,\n                    axis.title.x = element_text(size = textsize,\n                                                vjust=-0.3),\n                    panel.background = element_blank(), \n                    panel.border = element_rect(fill=NA), \n                    axis.text.x = element_text(size=16,color = \"black\"),\n                    axis.text.y = element_text(size=16, color = \"black\"),\n                    legend.title = element_text(size = 16),\n                    legend.text = element_text(size = 16), \n                    strip.text.x = element_text(size = textsize), \n                    strip.text.y = element_text(size = textsize), \n                    strip.background = element_blank(),\n                    legend.background=element_blank(),\n                    legend.key = element_rect(fill = \"white\"))",
+    "created" : 1449089074326.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1958404590",
+    "id" : "F5EE9566",
+    "lastKnownWriteTime" : 1447697957,
+    "path" : "~/GitHub/Indiana201213/scripts/theme-opts.R",
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

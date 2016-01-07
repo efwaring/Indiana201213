@@ -11,12 +11,14 @@
 
 
 # packages needed
+library(plyr)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(nlme)
 library(ade4)
 library(AICcmodavg)
+
 
 # for making figures
 source("theme-opts.R")
@@ -25,6 +27,7 @@ source("theme-opts.R")
 
 soil12 <- read.csv("lachat2012.csv")
 soil13 <- read.csv("lachat2013.csv")
+soilPRS <- read.csv("PRS_Soil.csv")
 
 plants12 <- read.csv("data2012.csv")
 plants13 <- read.csv("data2013.csv")
@@ -39,9 +42,7 @@ soil13$year <- 2013
 
 sub13 <- soil13 %>% filter(place==15|place==16)
 sub12 <- soil12 %>% group_by(site, rep, month, place,year) %>%
-        summarise(ammonia.g=mean(ammonia.g),
-                              ammonia.kg=mean(ammonia.kg),
-                              no3.no2.g=mean(no3.no2.g),
+        summarise(ammonia.kg=mean(ammonia.kg),
                               no3.no2.kg=mean(no3.no2.kg))
 
 
@@ -52,6 +53,12 @@ soil$yearf <- factor(soil$year,
                         labels=c("2012", "2013"))
 soil$placef <- factor(soil$place,
                          labels = 1:2)
+allsoilD <- ddply(soil, .(place, year, month), summarize,
+                  ammonia.kg_sd = sd(ammonia.kg),
+                  ammonia.kg=mean(ammonia.kg),
+                  no3.no2.kg_sd = sd(no3.no2.kg),
+                  no3.no2.kg=mean(no3.no2.kg))
+write.csv(allsoilD, "allsoil.csv")
 
 
 # keep in soil data from other sites besides 82a1 and 82a2
@@ -60,33 +67,35 @@ allSoil$placef <- factor(allSoil$place,
                         labels = 1:2)
 allSoil$yearf <- factor(allSoil$year,
                        labels=c("2012", "2013"))
+
 # comparasion between year
 
 amm.aov <- lm(ammonia.kg~month+place+year+month:year, data=soil)
 summary(amm.aov)
 anova(amm.aov)
 
-ggplot(soil, aes(month, ammonia.kg, shape=placef, color=yearf)) +
-  geom_point() +
-  geom_smooth(method="lm", se=F) +
-  scale_color_manual(name="Year",
-                     values = c("black", "gray50")) +
-  themeopts
 
-ggsave("ammoniaYear.pdf")
 
 nit.aov <- lm(no3.no2.kg~month+place+year+month:year, data=soil)
 summary(nit.aov)
 anova(nit.aov)
 
-ggplot(soil, aes(month, no3.no2.kg, shape=placef, color=yearf)) +
-  geom_point() +
-  geom_smooth(method="lm", se=F) +
-  scale_color_manual(name="Year",
-                     values = c("black", "gray50")) +
-  themeopts
+# PRS probes
 
-ggsave("NO2+3Year.pdf")
+prs.aov <- lm(Total.N~date+site+year+date:year, data=soilPRS)
+summary(prs.aov)
+anova(prs.aov)
+
+prsAVG <- ddply(soilPRS, .(site, year, date), summarize,
+                Total.N.sd = sd(Total.N),
+                Total.N = mean(Total.N),
+                NO3_sd =sd (NO3),
+                NO3=mean(NO3),
+                NH4_sd=sd(NH4),
+                NH4=mean(NH4))
+
+write.csv(prsAVG, "prsAVG.csv")
+
 
 # grouping similar measurments from 2012 and 2013
 # get only Cs and Pa in plants 13
@@ -102,6 +111,7 @@ p2012 <- plants12 %>% group_by(indi,site, rep, month, place, spp) %>%
 p2012$year <- "2012"
 
 plants <- rbind(p2012, p2013)
+plants$indi <- NULL
 
 
 plants$placef <- factor(plants$place,
@@ -122,80 +132,41 @@ plantSub$species <- factor(plantSub$spp,
                          labels=c("C. stricta", "P. arundinacea"))
 plantSub$LMA <- as.numeric(plantSub$LMA)
 plantSub$pro_area <- plantSub$ug.gfw_pr * plantSub$LMA
+plantSub$indi <- NULL
 
 
+plantSub2 <- na.omit(plantSub)
 
-
+plantSub_dd <- ddply(plantSub2, .(month, spp, site, rep, yearf), summarize,
+                     totC=mean(totC),
+                     C13=mean(C13),
+                     totN=mean(totN),
+                     pro_area=mean(pro_area),
+                     SLA=mean(SLA))
+write.csv(plantSub_dd, "AVgplantsbetweenyears.csv")
 #  comparasion between year
 
 totN.aov <- lm(totN~spp+month+place+year+month:year, data=plantSub)
 summary(totN.aov)
 anova(totN.aov)
 
-ggplot(plantSub, aes(month, totN, shape=placef, color=yearf)) +
-  geom_point() +
-  geom_smooth(method="lm", se=F) +
-  scale_color_manual(name="Year",
-                     values = c("black", "gray50")) +
-  facet_grid(species~.)+
-  themeopts
-ggsave("TotalNYear.pdf")
-
-
 totC.aov <- lm(totC~spp+month+place+year+month:year, data=plantSub)
 summary(totC.aov)
 anova(totC.aov)
-
-ggplot(plantSub, aes(month, totC, shape=placef, color=yearf)) +
-  geom_point() +
-  geom_smooth(method="lm", se=F) +
-  scale_color_manual(name="Year",
-                     values = c("black", "gray50")) +
-  facet_grid(species~.)+
-  themeopts
-ggsave("TotalCYear.pdf")
 
 c13.aov <- lm(C13~spp+month+place+year+month:year, data=plantSub)
 summary(c13.aov)
 anova(c13.aov)
 
-ggplot(plantSub, aes(month, C13, shape=placef, color=yearf)) +
-  geom_point() +
-  geom_smooth(method="lm", se=F) +
-  scale_color_manual(name="Year",
-                     values = c("black", "gray50")) +
-  facet_grid(species~.)+
-  themeopts
-ggsave("C13Year.pdf")
 
 SLA.aov <- lm(SLA~spp+month+place+year+month:year, data=plantSub)
 summary(SLA.aov)
 anova(SLA.aov)
 
-ggplot(plantSub, aes(month, SLA, shape=placef, color=yearf)) +
-  geom_point() +
-  geom_smooth(method="lm", se=F) +
-  scale_color_manual(name="Year",
-                     values = c("black", "gray50")) +
-  facet_grid(species~.)+
-  themeopts
-
-ggsave("SLAYear.pdf")
-
 pr.aov <- lm(pre_area~spp+month+place+year+month:year, data=plantSub)
 summary(pr.aov)
 anova(pr.aov)
 
-ggplot(plantSub, aes(month, pro_area, shape=placef, color=yearf)) +
-  geom_point() +
-  geom_smooth(method="lm", se=F) +
-  scale_color_manual(name="Year",
-                     values = c("black", "gray50")) +
-  labs(y="ug protein per cm^2")+
-  facet_grid(species~.)+
-  themeopts
-
-ggsave("proteinYear.pdf")
 
 # to answer question 1 need data from 2012. Using mixed effects model to 
 # analyize how physioloigcal traits differed seasonally and what this means
@@ -277,19 +248,25 @@ ggsave("PL.pdf")
 allP <- plants12 %>% gather("Npartition", "percentN", 32:34, na.rm=T) %>%
   select(indi, place, month, species, Npartition, percentN)
 
-allPM <- ddply(allP, .(month, species, variable), summarize,
-               proportion = mean(value),
-               proportionSD = sd(value))
+allPM <- ddply(allP, .(month, species, Npartition,place), summarize,
+               proportion = mean(percentN),
+               proportionSD = sd(percentN))
 
-ggplot(data=allPM, aes(month, proportion, color=variable, shape=variable)) +
+allPM$site <- factor(allPM$place, labels=c("Site 1","Site2"))
+
+ggplot(data=allPM, aes(month, proportion, color=Npartition, shape=Npartition)) +
   geom_pointrange(aes(ymin=proportion-proportionSD,
                       ymax=proportion+proportionSD))+
-  scale_color_manual(name="N placement",
-                     values = c("black", "gray50", "blue"))+
-  facet_grid(.~species)+
+  scale_color_manual(name="Allocation",
+                     values = c("black", "gray50", "blue"),
+                     labels=c("Carboxylation", "Bioenergics","Light Harvest"))+
+  scale_shape_manual(name="Allocation", values=c(1,2,5),
+                     labels=c("Carboxylation", "Bioenergics","Light Harvest"))+
+  facet_grid(species~site)+
+  labs(y="Proportion N")+
   themeopts
 
-ggsave("PALL.pdf")
+ggsave("PALL_sites.pdf")
 
 pca <- plants12 %>% select(ce,amba,vcmax,jmax,mgcl2.hr,nr.hr.chl,chl,
                            ug.gfw_pr, 
@@ -341,6 +318,11 @@ all <- merge(allSoil, p2013, by=c("place","month","rep", "year","site"))
 all$soilN <- all$ammonia.kg + all$no3.no2.kg
 all$ratio <- all$ammonia.kg/all$no3.no2.kg
 all$cn <- all$totC/all$totN
+all$LMA <- as.numeric(all$LMA)
+all$pro_area <- all$ug.gfw_pr * all$LMA
+
+
+
 
 all$speciesN <- as.numeric(factor(all$spp,labels=c(1:2)))
 
@@ -365,89 +347,87 @@ PCA13$eig #check # of axis with eig>1. Test these.
 
 loadings13 <- PCA13$co
 
-# Ranking the soil N in by 50 g of N
-all$soilFactor <- as.factor(ceiling(all$soilN/50))
 
 n.lme <- lme(totN ~ soilN + month + spp + soilN:month +
-               soilN:spp, random =~soilN|place,
+               soilN:spp, random =~1|place,
     data=all, na.action=na.omit)
 
 anova(n.lme)
 
 ggplot(all, aes(soilN, totN, shape=spp, color=spp)) +
-  geom_point()+
+  geom_point(size=3)+
   facet_grid(month~.)+ 
-  scale_color_manual(name="N species",
-                     values = c("black", "gray50"))+
-  geom_smooth(method="lm", se=F)+themeopts
-
-# with soil rankings
-ggplot(all, aes(month, totN, shape=soilFactor, fill=soilFactor)) +
-  geom_point()+
-  facet_grid(spp~.)+ 
-  scale_shape_manual(name="Total soil N (g/kg)",
-                     values=c(21,21,22,22,23,23,24,24,25,25))+
-  scale_fill_manual(name="Total soil N (g/kg)",
-                    values = c("black", NA, "black", NA, "black",NA,"black",NA,"black",NA)) +
+  stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
+  scale_color_manual(name="species",
+                     values = c("black", "gray50"),
+                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  scale_shape_manual(name="species",values=c(1,2), 
+                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  labs(x=("Total soil N (ppm)"), y=("Total leaf N (%)"))+
   themeopts
 
-ggsave("totN12_13.pdf")
+ggsave("totN13.pdf")
 
-sla.lme <- lme(SLA ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
+sla.lme <- lme(SLA ~ soilN + month + spp + soilN:month + soilN:spp,
+               random =~1|place,
              data=all, na.action=na.omit)
 
 anova(sla.lme)
 
 ggplot(all, aes(soilN, SLA, shape=spp, color=spp)) +
-  geom_point()+
-  facet_grid(month~.)+
-  scale_color_manual(name="N species",
-                     values = c("black", "gray50"))+
-  geom_smooth(method="lm", se=F)+themeopts
+  geom_point(size=3)+
+  facet_grid(month~.)+ 
+  stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
+  scale_color_manual(name="species",
+                     values = c("black", "gray50"),
+                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  scale_shape_manual(name="species",values=c(1,2), 
+                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  labs(x=("Total soil N (ppm)"), y=("SLA"))+
+  themeopts
 
-ggsave("sla12_13.pdf")
+ggsave("sla13.pdf")
 
-c13.lme <- lme(C13 ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
+c13.lme <- lme(C13 ~ soilN + month + spp + soilN:month + soilN:spp,
+               random =~1|place,
                data=all, na.action=na.omit)
 
 anova(c13.lme)
 
 ggplot(all, aes(soilN, C13, shape=spp, color=spp)) +
-  geom_point()+
-  facet_grid(month~.)+
-  scale_color_manual(name="N species",
-                     values = c("black", "gray50"))+
-  geom_smooth(method="lm", se=F)+themeopts
+  geom_point(size=3)+
+  facet_grid(month~.)+ 
+  stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
+  scale_color_manual(name="species",
+                     values = c("black", "gray50"),
+                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  scale_shape_manual(name="species",values=c(1,2), 
+                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  labs(x=("Total soil N (ppm)"), y=("Total leaf N (%)"))+
+  themeopts
 
-ggsave("c1312_13.pdf")
+ggsave("c13_13.pdf")
 
-cn.lme <- lme(cn ~ soilN + month + spp + soilN:month + soilN:spp, random =~1|place,
-               data=all, na.action=na.omit)
 
-anova(cn.lme)
 
-ggplot(all, aes(soilN, cn, shape=spp, color=spp)) +
-  geom_point()+
-  facet_grid(month~.)+
-  scale_color_manual(name="N species",
-                     values = c("black", "gray50"))+
-  geom_smooth(method="lm", se=F)+themeopts
-
-ggsave("CN12_13.pdf")
-
-pr.lme <- lme(ug.gfw_pr ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
+pr.lme <- lme(pro_area ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
                data=all, na.action=na.omit)
 
 anova(pr.lme)
 
-ggplot(all, aes(soilN, ug.gfw_pr, shape=spp, color=spp)) +
-  geom_point()+
-  facet_grid(month~.)+
-  scale_color_manual(name="N species",
-                     values = c("black", "gray50"))+
-  geom_smooth(method="lm", se=F)+themeopts
+ggplot(all, aes(soilN, log(pro_area), shape=spp, color=spp)) +
+  geom_point(size=3)+
+  facet_grid(month~.)+ 
+  stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
+  scale_color_manual(name="species",
+                     values = c("black", "gray50"),
+                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  scale_shape_manual(name="species",values=c(1,2), 
+                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  labs(x=("Total soil N (ppm)"), y=("log of Total Soluble Protein (ug/cm^2)"))+
+  themeopts
 
-ggsave("pr12_13.pdf")
+ggsave("protein13.pdf")
 
 
 # possibly use model selection for quesiton 2

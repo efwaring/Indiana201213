@@ -313,41 +313,36 @@ anova(biochem12.aov)
 # continous. 
 
 
+# reshape so only columns needed are there
 
-all <- merge(allSoil, p2013, by=c("place","month","rep", "year","site"))
+soil13_1 <- soil13 %>% select(place, month, year, ammonia.kg, no3.no2.kg)
+p2013_1 <- p2013 %>% select(place, month, year, spp, LMA, SLA, totN, totC,
+                            C13, ug.gfw_pr) 
+p2013_1$site <- NULL
+p2013_1$rep <-NULL
+p2013_1 <-subset(p2013_1, month!="12")
+
+
+all <- merge(soil13_1, p2013_1, all=T, by=c("place","month", "year"))
 all$soilN <- all$ammonia.kg + all$no3.no2.kg
 all$ratio <- all$ammonia.kg/all$no3.no2.kg
 all$cn <- all$totC/all$totN
 all$LMA <- as.numeric(all$LMA)
 all$pro_area <- all$ug.gfw_pr * all$LMA
 
-
-
-
-all$speciesN <- as.numeric(factor(all$spp,labels=c(1:2)))
-
-
 all$place <- as.numeric(all$place)
 all$month <- as.numeric(all$month)
 all$speciesN <- as.numeric(all$speciesN)
 all$year <- as.numeric(all$year)
 
-pcaA <- all %>% select(place, month, speciesN, soilN)
-pcaA <- na.omit(pcaA)
-
-pcaA <- cor(pcaA)
 
 
-PCA13 <- dudi.pca(pcaA,scale=T,scannf=F, nf=3)
-sums <- 100 * PCA13$eig/sum(PCA13$eig)
-cumsum(sums)
-scatter(PCA13)
-s.label(PCA13$co,boxes=F)
-PCA13$eig #check # of axis with eig>1. Test these.
+# remove MW 4 (place 12).
+#This site ended up being in outlier to do problems with  soilN
 
-loadings13 <- PCA13$co
+all <- subset(all, place!="12")
 
-
+#analysis
 n.lme <- lme(totN ~ soilN + month + spp + soilN:month +
                soilN:spp, random =~1|place,
     data=all, na.action=na.omit)

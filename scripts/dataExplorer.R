@@ -16,7 +16,6 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(nlme)
-library(ade4)
 library(AICcmodavg)
 
 
@@ -269,40 +268,7 @@ ggplot(data=allPM, aes(month, proportion, color=Npartition, shape=Npartition)) +
 ggsave("PALL_sites.pdf")
 
 pca <- plants12 %>% select(ce,amba,vcmax,jmax,mgcl2.hr,nr.hr.chl,chl,
-                           ug.gfw_pr, 
-                           SLA,totN,totC,C13, PC,PB,PL)
-pca <- na.omit(pca)
 
-pca <- cor(pca)
-
-
-PCA12 <- dudi.pca(pca,scale=T,scannf=F, nf=3)
-sums <- 100 * PCA12$eig/sum(PCA12$eig)
-cumsum(sums)
-scatter(PCA12)
-s.label(PCA12$co,boxes=F)
-PCA12$eig #check # of axis with eig>1. Test these.
-
-loadings <- PCA12$co
-
-write.csv(loadings, "loadings.csv")
-
-plants12$PCA1 <- PCA12$li$Axis1
-plants12$PCA2 <- PCA12$li$Axis2
-plants12$PCA3 <- PCA12$li$Axis3
-
-# stats for questions one
-photo12.aov <- lme(PCA1 ~ spp+month+place+spp:place+spp:month, 
-                     random=~1|indi, data=plants12)
-anova(photo12.aov)
-
-traits12.aov <- lme(PCA2 ~ spp+month+place+spp:place+spp:month, 
-                   random=~1|indi, data=plants12)
-anova(traits12.aov)
-
-biochem12.aov <- lme(PCA3 ~ spp+month+place+spp:place+spp:month, 
-                   random=~1|indi, data=plants12)
-anova(biochem12.aov)
 # to answer question 2, Do seasonal changes in leaf phys/morph traits relate 
 # to soil N? Need data from both 2012 and 2013.  Since there was no statistical
 # differences between leaf N or C13 or protein in 2012 and 2013 can include 

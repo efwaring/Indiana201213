@@ -281,15 +281,16 @@ pca <- plants12 %>% select(ce,amba,vcmax,jmax,mgcl2.hr,nr.hr.chl,chl,
 
 # reshape so only columns needed are there
 
-soil13_1 <- soil13 %>% select(place, month, year, ammonia.kg, no3.no2.kg)
-p2013_1 <- p2013 %>% select(place, month, year, spp, LMA, SLA, totN, totC,
-                            C13, ug.gfw_pr) 
-p2013_1$site <- NULL
+soil13_1 <- soil13 %>% select(site, place, month, year, ammonia.kg, 
+                              no3.no2.kg)
+p2013_1 <- p2013 %>% select(site, place, month, year, spp, LMA, SLA, totN,
+                            totC,C13, ug.gfw_pr) 
 p2013_1$rep <-NULL
 p2013_1 <-subset(p2013_1, month!="12")
 
 
-all <- merge(soil13_1, p2013_1, all=T, by=c("place","month", "year"))
+
+all <- merge(soil13_1, p2013_1, all=T, by=c("site","place","month", "year"))
 all$soilN <- all$ammonia.kg + all$no3.no2.kg
 all$ratio <- all$ammonia.kg/all$no3.no2.kg
 all$cn <- all$totC/all$totN
@@ -300,6 +301,7 @@ all$place <- as.numeric(all$place)
 all$month <- as.numeric(all$month)
 all$speciesN <- as.numeric(all$speciesN)
 all$year <- as.numeric(all$year)
+all$monthf <-factor(all$month, labels=c("May","July", "October"))
 
 
 
@@ -312,22 +314,21 @@ all <- subset(all, place!="12")
 n.lme <- lme(totN ~ soilN + month + spp + soilN:month +
                soilN:spp, random =~1|place,
     data=all, na.action=na.omit)
-
+summary(n.lme)
 anova(n.lme)
 
-ggplot(all, aes(soilN, totN, shape=spp, color=spp)) +
+allFig <-na.omit(all)
+ggplot(allFig, aes(soilN, totN, shape=monthf, color=monthf)) +
   geom_point(size=3)+
-  facet_grid(month~.)+ 
-  stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
-  scale_color_manual(name="species",
-                     values = c("black", "gray50"),
-                     labels= c("Carex stricta","Phalaris arudinacea"))+
-  scale_shape_manual(name="species",values=c(1,2), 
-                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  facet_grid(.~spp)+ 
+  #stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
+  scale_color_manual(name="Month",
+                    values = c("black", "gray50","gray15"))+
+  scale_shape_manual(name="Month",values=c(1,2,3))+
   labs(x=("Total soil N (ppm)"), y=("Total leaf N (%)"))+
   themeopts
 
-ggsave("totN13.pdf")
+ggsave("totN13_flip.pdf")
 
 sla.lme <- lme(SLA ~ soilN + month + spp + soilN:month + soilN:spp,
                random =~1|place,
@@ -335,15 +336,13 @@ sla.lme <- lme(SLA ~ soilN + month + spp + soilN:month + soilN:spp,
 
 anova(sla.lme)
 
-ggplot(all, aes(soilN, SLA, shape=spp, color=spp)) +
+ggplot(allFig, aes(soilN, SLA, shape=monthf, color=monthf)) +
   geom_point(size=3)+
-  facet_grid(month~.)+ 
-  stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
-  scale_color_manual(name="species",
-                     values = c("black", "gray50"),
-                     labels= c("Carex stricta","Phalaris arudinacea"))+
-  scale_shape_manual(name="species",values=c(1,2), 
-                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  facet_grid(.~spp)+ 
+  #stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
+  scale_color_manual(name="Month",
+                     values = c("black", "gray50","gray15"))+
+  scale_shape_manual(name="Month",values=c(1,2,3))+
   labs(x=("Total soil N (ppm)"), y=("SLA"))+
   themeopts
 
@@ -355,36 +354,32 @@ c13.lme <- lme(C13 ~ soilN + month + spp + soilN:month + soilN:spp,
 
 anova(c13.lme)
 
-ggplot(all, aes(soilN, C13, shape=spp, color=spp)) +
+ggplot(allFig, aes(soilN, C13, shape=monthf, color=monthf)) +
   geom_point(size=3)+
-  facet_grid(month~.)+ 
-  stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
-  scale_color_manual(name="species",
-                     values = c("black", "gray50"),
-                     labels= c("Carex stricta","Phalaris arudinacea"))+
-  scale_shape_manual(name="species",values=c(1,2), 
-                     labels= c("Carex stricta","Phalaris arudinacea"))+
-  labs(x=("Total soil N (ppm)"), y=("Total leaf N (%)"))+
+  facet_grid(.~spp)+ 
+  #stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
+  scale_color_manual(name="Month",
+                     values = c("black", "gray50","gray15"))+
+  scale_shape_manual(name="Month",values=c(1,2,3))+
+  labs(x=("Total soil N (ppm)"), y=("13C (‰)"))+
   themeopts
 
 ggsave("c13_13.pdf")
 
 
 
-pr.lme <- lme(pro_area ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
+pr.lme <- lme(pro_arear ~ soilN + month + spp + soilN:month + soilN:spp + place, random =~1|place,
                data=all, na.action=na.omit)
 
 anova(pr.lme)
 
-ggplot(all, aes(soilN, log(pro_area), shape=spp, color=spp)) +
+ggplot(allFig, aes(soilN, log(pro_area), shape=monthf, color=monthf)) +
   geom_point(size=3)+
-  facet_grid(month~.)+ 
-  stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
-  scale_color_manual(name="species",
-                     values = c("black", "gray50"),
-                     labels= c("Carex stricta","Phalaris arudinacea"))+
-  scale_shape_manual(name="species",values=c(1,2), 
-                     labels= c("Carex stricta","Phalaris arudinacea"))+
+  facet_grid(.~spp)+ 
+  #stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
+  scale_color_manual(name="Month",
+                     values = c("black", "gray50","gray15"))+
+  scale_shape_manual(name="Month",values=c(1,2,3))+
   labs(x=("Total soil N (ppm)"), y=("log of Total Soluble Protein (ug/cm^2)"))+
   themeopts
 

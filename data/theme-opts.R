@@ -1,0 +1,16 @@
+textsize <- 18
+themeopts <- theme( axis.title.y = element_text(size = textsize, 
+                                                angle = 90,vjust=0.3) ,
+                    axis.title.x = element_text(size = textsize,
+                                                vjust=-0.3),
+                    panel.background = element_blank(), 
+                    panel.border = element_rect(fill=NA), 
+                    axis.text.x = element_text(size=16,color = "black"),
+                    axis.text.y = element_text(size=16, color = "black"),
+                    legend.title = element_text(size = 16),
+                    legend.text = element_text(size = 16), 
+                    strip.text.x = element_text(size = textsize), 
+                    strip.text.y = element_text(size = textsize), 
+                    strip.background = element_blank(),
+                    legend.background=element_blank(),
+                    legend.key = element_rect(fill = "white"))

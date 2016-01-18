@@ -251,21 +251,22 @@ allPM <- ddply(allP, .(month, species, Npartition,place), summarize,
                proportion = mean(percentN),
                proportionSD = sd(percentN))
 
-allPM$site <- factor(allPM$place, labels=c("Site 1","Site2"))
+allPM$site <- factor(allPM$place, labels=c("Site 1","Site 2"))
 
 ggplot(data=allPM, aes(month, proportion, color=Npartition, shape=Npartition)) +
   geom_pointrange(aes(ymin=proportion-proportionSD,
-                      ymax=proportion+proportionSD))+
-  scale_color_manual(name="Allocation",
+                      ymax=proportion+proportionSD), size=0.75)+
+  scale_color_manual(name="Allocation Location",
                      values = c("black", "gray50", "blue"),
                      labels=c("Carboxylation", "Bioenergics","Light Harvest"))+
-  scale_shape_manual(name="Allocation", values=c(1,2,5),
+  scale_shape_manual(name="Allocation Location", values=c(1,2,5),
                      labels=c("Carboxylation", "Bioenergics","Light Harvest"))+
   facet_grid(species~site)+
-  labs(y="Proportion N")+
-  themeopts
+  labs(y="Proportion of Allocated N", x="Month")+
+  themeopts+
+  theme(strip.text.y=element_text(face="italic"))
 
-ggsave("PALL_sites.pdf")
+ggsave("PALL_sites_final.pdf")
 
 # 2012 only figures
 
@@ -275,7 +276,22 @@ plants12$species <- factor(plants12$spp,
                            labels=c("C. stricta", "P. arundinacea"))
 plants12$LMA <- as.numeric(plants12$LMA)
 plants12$pro_area <- plants12$ug.gfw_pr * plants12$LMA
-plants12$site <- factor(plants12$place, labels=c("Site 1","Site2"))
+plants12$site <- factor(plants12$place, labels=c("Site 1","Site 2"))
+
+ggplot(plants12, aes(month, PNUE, color=species, shape=species)) +
+  geom_point(size=3)+
+  scale_color_manual(name="Species",
+                     values = c("black", "gray50"))+
+  scale_shape_manual(name="Species", values=c(1,2))+
+  facet_grid(.~site)+
+  scale_y_continuous(expression(
+    PNUE[] ~ ( mu * mol %.% g^{-1} %.% s^{-1} ) ) )+
+  labs(x="Month") +
+  themeopts+
+  theme(legend.text=element_text(face="italic"))
+
+ggsave("pnue.pdf")
+
 
 ggplot(plants12, aes(month, vcmax, color=species, shape=species)) +
   geom_point(size=3)+
@@ -283,8 +299,12 @@ ggplot(plants12, aes(month, vcmax, color=species, shape=species)) +
                      values = c("black", "gray50"))+
   scale_shape_manual(name="Species", values=c(1,2))+
   facet_grid(.~site)+
-  labs(y="Vcmax")+
-  themeopts
+  scale_y_continuous(expression(
+    V[cmax] ~ ( mu * mol %.% m^{-2} %.% s^{-1} ) ) )+
+  labs(x="Month") +
+  themeopts+
+  theme(legend.text=element_text(face="italic"))
+
 ggsave("vcmax.pdf")
 vcmax.lme <- lme(vcmax ~ spp+month+place+spp:place+spp:month, 
               random=~1|indi, data=plants12, na.action=na.omit)
@@ -297,26 +317,16 @@ ggplot(plants12, aes(month, jmax, color=species, shape=species)) +
                      values = c("black", "gray50"))+
   scale_shape_manual(name="Species", values=c(1,2))+
   facet_grid(.~site)+
-  labs(y="Jmax")+
-  themeopts
+  scale_y_continuous(expression(
+    J[max] ~ ( mu * mol %.% m^{-2} %.% s^{-1} ) ) )+
+  labs(x="Month") +
+  themeopts+
+  theme(legend.text=element_text(face="italic"))
 ggsave("Jmax.pdf")
 jmax.lme <- lme(jmax ~ spp+month+place+spp:place+spp:month, 
                  random=~1|indi, data=plants12, na.action=na.omit)
 anova(jmax.lme)
 
-ggplot(plants12, aes(month, SLA, color=species, shape=species)) +
-  geom_point(size=3)+
-  scale_color_manual(name="Species",
-                     values = c("black", "gray50"))+
-  scale_shape_manual(name="Species", values=c(1,2))+
-  facet_grid(.~site)+
-  labs(y="SLA")+
-  themeopts
-ggsave("SLA.pdf")
-
-sla12.lme <- lme(SLA ~ spp+month+place+spp:place+spp:month, 
-                 random=~1|indi, data=plants12, na.action=na.omit)
-anova(sla12.lme)
 
 ggplot(plants12, aes(month, chl, color=species, shape=species)) +
   geom_point(size=3)+
@@ -324,13 +334,32 @@ ggplot(plants12, aes(month, chl, color=species, shape=species)) +
                      values = c("black", "gray50"))+
   scale_shape_manual(name="Species", values=c(1,2))+
   facet_grid(.~site)+
-  labs(y="chl")+
-  themeopts
+  scale_y_continuous(expression(Chlorophyll ~ ( mu * g %.% gfw^{-1}) ) )  +
+  labs(x="Month")+
+  themeopts+
+  theme(legend.text=element_text(face="italic"))
 ggsave("chl.pdf")
 
 chl.lme <- lme(chl ~ spp+month+place+spp:place+spp:month, 
                  random=~1|indi, data=plants12, na.action=na.omit)
 anova(chl.lme)
+
+ggplot(plants12, aes(month, ce, color=species, shape=species)) +
+  geom_point(size=3)+
+  scale_color_manual(name="Species",
+                     values = c("black", "gray50"))+
+  scale_shape_manual(name="Species", values=c(1,2))+
+  facet_grid(.~site)+
+  labs(y=expression(paste(
+    CE[]," (", mu * mol %.% m^{-2} %.% s^{-1} %.% kPa^{-1}, ")")))+
+  labs(x="Month")+
+  themeopts+
+  theme(legend.text=element_text(face="italic"))
+ggsave("ce.pdf")
+
+ce.lme <- lme(ce ~ spp+month+place+spp:place+spp:month, 
+               random=~1|indi, data=plants12, na.action=na.omit)
+anova(ce.lme)
 
 # to answer question 2, Do seasonal changes in leaf phys/morph traits relate 
 # to soil N? Need data from both 2012 and 2013.  Since there was no statistical
@@ -363,13 +392,15 @@ all$pro_area <- all$ug.gfw_pr * all$LMA
 all$place <- as.numeric(all$place)
 all$month <- as.numeric(all$month)
 all$monthf <-factor(all$month, labels=c("May","July", "October"))
-
+all$species <- factor(all$spp,
+                           labels=c("C. stricta", "P. arundinacea"))
 
 
 # remove MW 4 (place 12).
 #This site ended up being in outlier to do problems with  soilN
 
 all <- subset(all, place!="12")
+allFig <-na.omit(all)
 
 # subset of 13C and protein for table
 Tab3 <- ddply(allFig, .(spp, monthf), summarize,
@@ -386,18 +417,22 @@ n.lme <- lme(totN ~ soilN + month + spp + soilN:month +
 summary(n.lme)
 anova(n.lme)
 
-allFig <-na.omit(all)
+
+n.gl <- glmer(totN ~ soilN + month + spp + soilN:month +
+                       soilN:spp, random =~1|place,
+                     data=all, na.action=na.omit)
+
+
 ggplot(allFig, aes(soilN, totN, shape=monthf, color=monthf)) +
   geom_point(size=3)+
-  facet_grid(.~spp)+ 
-  #stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
+  facet_grid(.~species)+ 
   scale_color_manual(name="Month",
                     values = c("black", "gray50","gray15"))+
   scale_shape_manual(name="Month",values=c(1,2,3))+
   labs(x=("Total soil N (ppm)"), y=("Total leaf N (%)"))+
   themeopts
 
-ggsave("totN13_flip.pdf")
+ggsave("totN13_final.pdf")
 
 sla.lme <- lme(SLA ~ soilN + month + spp + soilN:month + soilN:spp,
                random =~1|place,
@@ -407,15 +442,17 @@ anova(sla.lme)
 
 ggplot(allFig, aes(soilN, SLA, shape=monthf, color=monthf)) +
   geom_point(size=3)+
-  facet_grid(.~spp)+ 
+  facet_grid(.~species)+ 
   #stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
   scale_color_manual(name="Month",
                      values = c("black", "gray50","gray15"))+
   scale_shape_manual(name="Month",values=c(1,2,3))+
-  labs(x=("Total soil N (ppm)"), y=("SLA"))+
-  themeopts
+  labs(y=expression(paste("SLA (",cm^{2} %.% g^{-1}, ")")))  +
+  labs(x=("Total soil N (ppm)"))+
+  themeopts+
+  theme(strip.text.x=element_text(face="italic"))
 
-ggsave("sla13.pdf")
+ggsave("sla13_final.pdf")
 
 c13.lme <- lme(C13 ~ soilN + month + spp + place+soilN:month + soilN:spp,
                random =~1|place,
@@ -425,15 +462,16 @@ anova(c13.lme)
 
 ggplot(allFig, aes(soilN, C13, shape=monthf, color=monthf)) +
   geom_point(size=3)+
-  facet_grid(.~spp)+ 
-  #stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, se=F)+
+  facet_grid(.~species)+ 
   scale_color_manual(name="Month",
                      values = c("black", "gray50","gray15"))+
   scale_shape_manual(name="Month",values=c(1,2,3))+
   labs(x=("Total soil N (ppm)"), y=("13C (‰)"))+
-  themeopts
+  themeopts+
+  theme(strip.text.x=element_text(face="italic"))
 
-ggsave("c13_13.pdf")
+
+ggsave("c13_final.pdf")
 
 
 

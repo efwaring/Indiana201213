@@ -16,7 +16,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(nlme)
-library(AICcmodavg)
+library(xtable)
 
 
 # for making figures

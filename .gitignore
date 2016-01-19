@@ -5,4 +5,5 @@
 *.png
 *.pdf
 *.Rproj.user
+*.Rproj.user\*
 Indiana2012_2013\*

@@ -10,4 +10,4 @@
 *.pdf
 *.Rproj.user
 *.Rproj.user\*
-
+.Rprofile

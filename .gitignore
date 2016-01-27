@@ -4,6 +4,8 @@
 *.[Rr][dD]ata 
 *.html
 *.[Rr]proj
+*.[Rr]proj.user
+*.jpeg
 *.png
 *.pdf
 *.Rproj.user
